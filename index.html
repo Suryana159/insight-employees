@@ -1235,8 +1235,7 @@ function adminFormHtml(){
           '<button type="button" data-ed-cmd="insertUnorderedList" title="Daftar bullet">• ≡</button>' +
           '<button type="button" data-ed-cmd="insertOrderedList" title="Daftar angka">1. ≡</button>' +
           '<span class="sep"></span>' +
-          '<button type="button" id="ed_image_url_btn" title="Sisipkan foto dari URL">🔗 Foto</button>' +
-          '<label class="ed-upload-btn" title="Upload foto dari perangkat">⬆ Foto<input type="file" id="ed_image_upload" accept="image/*" style="display:none;"></label>' +
+          '<label class="ed-upload-btn" title="Upload foto dari perangkat">⬆ Upload Foto<input type="file" id="ed_image_upload" accept="image/*" style="display:none;"></label>' +
         '</div>' +
         '<div id="f_content_editor" class="editor-content" contenteditable="true">' + (a.contentHtml || legacyContentToHtml(a.content)) + '</div>' +
       '</div>' +
@@ -1452,19 +1451,13 @@ function saveArticleFromForm(){
 
 /* ---- Rich text editor toolbar (kept separate from data-action so it never triggers render()) ---- */
 document.addEventListener("mousedown", function(e){
-  if(e.target.closest("button[data-ed-cmd]") || e.target.closest("#ed_image_url_btn")) e.preventDefault();
+  if(e.target.closest("button[data-ed-cmd]")) e.preventDefault();
 });
 document.addEventListener("click", function(e){
   const cmdBtn = e.target.closest("button[data-ed-cmd]");
   if(cmdBtn){
     const editor = document.getElementById("f_content_editor");
     if(editor){ editor.focus(); document.execCommand(cmdBtn.getAttribute("data-ed-cmd"), false, null); }
-    return;
-  }
-  const urlBtn = e.target.closest("#ed_image_url_btn");
-  if(urlBtn){
-    const url = prompt("Tempel URL foto (https://...)");
-    if(url) insertEditorImage(url.trim());
     return;
   }
 });
