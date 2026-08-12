@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notulen Musyawarah 5 Unsur</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --ink:#20261F;
+    --paper:#F7F4EC;
+    --paper-2:#EFEADB;
+    --teal:#0E4A44;
+    --teal-2:#0B3834;
+    --teal-tint:#E4EEEA;
+    --gold:#B8892B;
+    --gold-2:#DDB35C;
+    --line:#D8CFB8;
+    --danger:#A23B2E;
+    --ok:#3E7C4A;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 500px at 10% -10%, #103F3A 0%, transparent 60%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .font-display{font-family:'Lora',serif;}
+  .font-mono{font-family:'JetBrains Mono',monospace;}
+
+  /* Header / masthead */
+  .masthead{
+    background:linear-gradient(180deg,var(--teal) 0%, var(--teal-2) 100%);
+    color:#F3EFE2;
+    padding:28px 20px 22px;
+    position:relative;
+    border-bottom:3px solid var(--gold);
+  }
+  .masthead::after{
+    content:"";
+    position:absolute; inset:0;
+    background-image:repeating-linear-gradient(135deg, rgba(255,255,255,0.035) 0 2px, transparent 2px 22px);
+    pointer-events:none;
+  }
+  .masthead-inner{max-width:1080px;margin:0 auto;position:relative;}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color:var(--gold-2);
+    margin-bottom:6px;
+  }
+  .masthead h1{
+    font-family:'Lora',serif;
+    font-weight:700;
+    font-size:clamp(24px,4vw,34px);
+    margin:0 0 4px;
+    letter-spacing:.01em;
+  }
+  .masthead p.sub{
+    margin:0;
+    color:#CFE3DB;
+    font-size:13.5px;
+  }
+  .meta-row{
+    display:flex; gap:14px; flex-wrap:wrap;
+    margin-top:18px;
+  }
+  .meta-field{
+    background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.18);
+    border-radius:8px;
+    padding:8px 12px;
+    min-width:200px;
+    flex:1;
+  }
+  .meta-field label{
+    display:block;
+    font-size:10.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--gold-2);
+    margin-bottom:3px;
+  }
+  .meta-field input{
+    background:transparent;
+    border:none;
+    color:#fff;
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    width:100%;
+    outline:none;
+  }
+  .meta-field input::placeholder{color:rgba(255,255,255,0.45);}
+
+  /* admin bar */
+  .admin-bar{
+    display:flex; justify-content:flex-end; align-items:center; gap:10px;
+    margin-bottom:8px;
+    flex-wrap:wrap;
+  }
+  .admin-badge{
+    display:flex; align-items:center; gap:7px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.04em;
+    color:#F3EFE2;
+    background:rgba(255,255,255,0.08);
+    border:1px solid rgba(255,255,255,0.2);
+    padding:6px 12px;
+    border-radius:999px;
+  }
+  .admin-badge.is-admin{
+    background:rgba(221,179,92,0.18);
+    border-color:var(--gold-2);
+    color:var(--gold-2);
+  }
+  .admin-badge .dot{
+    width:7px;height:7px;border-radius:50%;
+    background:#9AA69C;
+    flex-shrink:0;
+  }
+  .admin-badge.is-admin .dot{background:var(--gold-2); box-shadow:0 0 6px var(--gold-2);}
+  .admin-bar button{
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.28);
+    color:#F3EFE2;
+    font-family:'Inter',sans-serif;
+    font-size:11.5px;
+    font-weight:600;
+    padding:6px 12px;
+    border-radius:999px;
+    cursor:pointer;
+  }
+  .admin-bar button:hover{background:rgba(255,255,255,0.1);}
+
+  /* lock note in list section */
+  .lock-note{
+    display:flex; align-items:flex-start; gap:10px;
+    background:var(--teal-tint);
+    border:1px solid #C9DCD4;
+    border-radius:8px;
+    padding:10px 14px;
+    font-size:12.5px;
+    color:#2E4A44;
+    margin-bottom:14px;
+  }
+  .lock-note b{color:var(--teal-2);}
+  .access-locked{
+    text-align:center; padding:40px 20px; color:#8B8368;
+  }
+  .access-locked .stamp{
+    width:56px;height:56px;border:2px dashed var(--gold);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 12px; font-family:'Lora',serif; font-size:22px; color:var(--gold);
+  }
+  .access-locked p{margin:4px 0; font-size:13.5px;}
+
+  /* pin modal */
+  .pin-input{
+    width:100%;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    padding:11px 14px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:18px;
+    letter-spacing:.3em;
+    text-align:center;
+    outline:none;
+    margin-bottom:14px;
+  }
+  .pin-input:focus{border-color:var(--teal);}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:26px 20px 60px;}
+
+  /* section card */
+  .card{
+    background:#FFFDF8;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px;
+    margin-bottom:22px;
+    box-shadow:0 1px 0 rgba(20,30,25,0.03);
+  }
+  .section-label{
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:16px;
+  }
+  .section-num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--gold);
+    border:1px solid var(--gold);
+    border-radius:50%;
+    width:26px;height:26px;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .section-title{
+    font-family:'Lora',serif;
+    font-weight:700;
+    font-size:17px;
+    color:var(--teal-2);
+  }
+  .section-hint{
+    font-size:12.5px;
+    color:#7A7160;
+    margin:-10px 0 16px 36px;
+  }
+
+  /* Kelompok grid */
+  .kelompok-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+    gap:10px;
+  }
+  .kel-btn{
+    position:relative;
+    background:var(--paper-2);
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    padding:13px 10px 11px;
+    cursor:pointer;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    color:var(--teal-2);
+    text-align:left;
+    transition:all .15s ease;
+  }
+  .kel-btn:hover{border-color:var(--gold); transform:translateY(-1px);}
+  .kel-btn .count{
+    display:block;
+    font-family:'JetBrains Mono',monospace;
+    font-weight:400;
+    font-size:10.5px;
+    color:#8B8368;
+    margin-top:3px;
+  }
+  .kel-btn.active{
+    background:var(--teal);
+    border-color:var(--teal);
+    color:#fff;
+  }
+  .kel-btn.active .count{color:var(--gold-2);}
+  .kel-btn.active::before{
+    content:"✓";
+    position:absolute; top:6px; right:8px;
+    font-size:11px; color:var(--gold-2);
+  }
+
+  /* form */
+  .form-panel{margin-top:18px; border-top:1px dashed var(--line); padding-top:18px;}
+  .field{margin-bottom:14px;}
+  .field label{
+    display:block;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--teal-2);
+    margin-bottom:6px;
+  }
+  .field .opt{font-weight:400; color:#8B8368; font-size:11px;}
+  .field input[type=text], .field input[type=date], .field textarea{
+    width:100%;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    padding:10px 12px;
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    color:var(--ink);
+    background:#fff;
+    outline:none;
+    transition:border-color .15s;
+  }
+  .field input:focus, .field textarea:focus{border-color:var(--teal);}
+  .field textarea{resize:vertical; min-height:74px; line-height:1.5;}
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  @media (max-width:640px){.two-col{grid-template-columns:1fr;}}
+
+  /* dynamic repeatable rows: pembahasan / solusi / penanggung jawab */
+  .dyn-list{display:flex; flex-direction:column; gap:8px;}
+  .dyn-row{display:flex; gap:8px; align-items:flex-start;}
+  .dyn-row .dyn-input{
+    flex:1;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    padding:9px 11px;
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    color:var(--ink);
+    background:#fff;
+    outline:none;
+    transition:border-color .15s;
+  }
+  .dyn-row .dyn-input:focus{border-color:var(--teal);}
+  textarea.dyn-input{resize:vertical; min-height:52px; line-height:1.5;}
+  .dyn-row .dyn-remove{
+    flex-shrink:0;
+    width:32px; height:32px;
+    border:1.5px solid var(--line);
+    background:#fff;
+    border-radius:7px;
+    color:var(--danger);
+    font-size:16px;
+    line-height:1;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    margin-top:1px;
+  }
+  .dyn-row .dyn-remove:hover{background:#F6E4E0; border-color:var(--danger);}
+  .btn-add{
+    display:inline-flex; align-items:center; gap:6px;
+    background:none;
+    border:1.5px dashed var(--gold);
+    color:var(--gold);
+    border-radius:7px;
+    padding:6px 12px;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:12.5px;
+    cursor:pointer;
+    margin-top:8px;
+  }
+  .btn-add:hover{background:#FBF3E2;}
+
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    border:none; border-radius:8px;
+    padding:11px 18px;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13.5px;
+    cursor:pointer;
+    transition:filter .15s, transform .1s;
+  }
+  .btn:active{transform:scale(.98);}
+  .btn-primary{background:var(--teal); color:#fff;}
+  .btn-primary:hover{filter:brightness(1.1);}
+  .btn-gold{background:var(--gold); color:#3A2A05;}
+  .btn-gold:hover{filter:brightness(1.08);}
+  .btn-ghost{background:transparent; color:var(--teal-2); border:1.5px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--teal);}
+  .btn-danger{background:#F6E4E0; color:var(--danger);}
+  .btn-danger:hover{filter:brightness(0.97);}
+  .btn:disabled{opacity:.45; cursor:not-allowed;}
+
+  /* toolbar */
+  .toolbar{
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+    justify-content:space-between;
+    margin-bottom:16px;
+  }
+  .filter-pills{display:flex; flex-wrap:wrap; gap:6px;}
+  .pill{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;
+    padding:5px 10px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:#fff;
+    cursor:pointer;
+    color:var(--teal-2);
+  }
+  .pill.active{background:var(--teal); border-color:var(--teal); color:#fff;}
+
+  /* record list = ledger entries */
+  .entry{
+    border:1px solid var(--line);
+    border-left:4px solid var(--gold);
+    border-radius:8px;
+    padding:16px 18px;
+    margin-bottom:12px;
+    background:#fff;
+    position:relative;
+  }
+  .entry-head{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    gap:10px; margin-bottom:10px; flex-wrap:wrap;
+  }
+  .entry-kel{
+    font-family:'Lora',serif; font-weight:700; font-size:15px; color:var(--teal-2);
+  }
+  .entry-idx{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--gold);
+  }
+  .entry-meta{
+    font-size:11.5px; color:#8B8368; margin-top:2px;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .entry-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:6px;}
+  @media (max-width:640px){.entry-grid{grid-template-columns:1fr;}}
+  .entry-block .k{
+    font-size:10.5px; text-transform:uppercase; letter-spacing:.07em;
+    color:#8B8368; margin-bottom:3px; font-weight:600;
+  }
+  .entry-block .v{font-size:13.5px; line-height:1.5; color:var(--ink); white-space:pre-wrap;}
+  .entry-actions{display:flex; gap:8px; margin-top:12px;}
+  .entry-actions button{
+    background:none; border:none; cursor:pointer;
+    font-size:12px; font-weight:600; color:var(--teal);
+    padding:4px 8px; border-radius:6px;
+  }
+  .entry-actions button:hover{background:var(--teal-tint);}
+  .entry-actions button.del{color:var(--danger);}
+  .entry-actions button.del:hover{background:#F6E4E0;}
+
+  .empty-state{
+    text-align:center; padding:40px 20px; color:#8B8368;
+  }
+  .empty-state .stamp{
+    width:56px;height:56px;border:2px dashed var(--gold);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 12px; font-family:'Lora',serif; font-size:22px; color:var(--gold);
+  }
+  .empty-state p{margin:4px 0; font-size:13.5px;}
+
+  footer.appfoot{
+    text-align:center;
+    padding:22px 0 6px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.06em;
+    color:#9A9178;
+  }
+  footer.appfoot span{color:var(--gold);}
+
+  .toast{
+    position:fixed; bottom:22px; left:50%; transform:translateX(-50%);
+    background:var(--teal-2); color:#F3EFE2;
+    padding:11px 20px; border-radius:8px;
+    font-size:13px; font-weight:500;
+    box-shadow:0 6px 20px rgba(0,0,0,0.25);
+    z-index:200; opacity:0; pointer-events:none;
+    transition:opacity .25s, transform .25s;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(-4px);}
+
+  .badge-count{
+    display:inline-block; background:var(--teal-tint); color:var(--teal-2);
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    padding:2px 8px; border-radius:999px; margin-left:8px;
+  }
+
+  /* modal */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(20,30,25,0.55);
+    display:none; align-items:center; justify-content:center;
+    z-index:300; padding:20px;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal-box{
+    background:#FFFDF8; border-radius:10px; max-width:400px; width:100%;
+    padding:22px; border:1px solid var(--line);
+  }
+  .modal-box h3{font-family:'Lora',serif; margin:0 0 8px; color:var(--teal-2);}
+  .modal-box p{font-size:13.5px; color:#5A5343; margin:0 0 18px;}
+  .modal-actions{display:flex; gap:10px; justify-content:flex-end;}
+
+  /* print-only doc container built off-screen for PDF export */
+  #pdf-render-area{position:fixed; left:-9999px; top:0; width:794px; background:#fff;}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="admin-bar" id="adminBar"></div>
+    <div class="eyebrow">Dokumen Internal &middot; Musyawarah 5 Unsur</div>
+    <h1>Notulen Musyawarah 5 Unsur</h1>
+    <p class="sub">Catatan pembahasan, solusi, dan tindak lanjut dari setiap kelompok wilayah.</p>
+    <div class="meta-row">
+      <div class="meta-field" style="max-width:260px;">
+        <label>Tanggal Musyawarah</label>
+        <input type="date" id="tglMusyawarah">
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- STEP 1: pilih kelompok -->
+  <div class="card">
+    <div class="section-label">
+      <div class="section-num">1</div>
+      <div class="section-title">Pilih Nama Kelompok</div>
+    </div>
+    <div class="section-hint">Pilih kelompok yang akan diinput notulennya. Setiap kelompok bisa memiliki lebih dari satu catatan.</div>
+    <div class="kelompok-grid" id="kelompokGrid"></div>
+
+    <!-- STEP 2-6: form -->
+    <div class="form-panel" id="formPanel" style="display:none;">
+      <div class="section-label" style="margin-bottom:14px;">
+        <div class="section-num">2</div>
+        <div class="section-title">Isi Notulen untuk <span id="formKelName" style="color:var(--gold);"></span></div>
+      </div>
+
+      <div class="field">
+        <label>Nama Notulis</label>
+        <input type="text" id="fNotulis" placeholder="Nama pencatat notulen kelompok ini">
+      </div>
+
+      <div class="field">
+        <label>Pembahasan <span class="opt">(bisa lebih dari satu)</span></label>
+        <div class="dyn-list" id="pembahasanRows"></div>
+        <button type="button" class="btn-add" id="btnAddPembahasan">+ Tambah Pembahasan</button>
+      </div>
+
+      <div class="field">
+        <label>Solusi Permasalahan <span class="opt">(bisa lebih dari satu)</span></label>
+        <div class="dyn-list" id="solusiRows"></div>
+        <button type="button" class="btn-add" id="btnAddSolusi">+ Tambah Solusi</button>
+      </div>
+
+      <div class="field">
+        <label>Penanggung Jawab Solusi <span class="opt">(bisa lebih dari satu)</span></label>
+        <div class="dyn-list" id="pjRows"></div>
+        <button type="button" class="btn-add" id="btnAddPJ">+ Tambah Penanggung Jawab</button>
+      </div>
+
+      <div class="field">
+        <label>Batas Waktu Pelaksanaan Solusi</label>
+        <input type="date" id="fBatasWaktu" style="max-width:260px;">
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:6px;">
+        <button class="btn btn-primary" id="btnSave">Simpan Notulen</button>
+        <button class="btn btn-ghost" id="btnCancelEdit" style="display:none;">Batal Edit</button>
+        <button class="btn btn-ghost" id="btnClearForm">Bersihkan Form</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIST -->
+  <div class="card">
+    <div class="section-label">
+      <div class="section-num">3</div>
+      <div class="section-title">Daftar Notulen Tersimpan<span class="badge-count" id="totalCount">0</span></div>
+    </div>
+
+    <div id="lockNoteWrap"></div>
+
+    <div class="toolbar">
+      <div class="filter-pills" id="filterPills"></div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-ghost" id="btnRefresh">🔄 Sinkron</button>
+        <button class="btn btn-gold" id="btnExportPdf">⬇ Export PDF</button>
+        <button class="btn btn-ghost" id="btnExportCsv">⬇ Export CSV</button>
+      </div>
+    </div>
+
+    <div id="entryList"></div>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div class="stamp">∅</div>
+      <p><strong>Belum ada notulen tersimpan.</strong></p>
+      <p>Pilih kelompok di atas lalu isi form untuk mulai mencatat.</p>
+    </div>
+    <div class="access-locked" id="accessLocked" style="display:none;">
+      <div class="stamp">🔒</div>
+      <p><strong>Pilih kelompok Anda terlebih dahulu.</strong></p>
+      <p>Anda hanya dapat melihat notulen kelompok yang Anda pilih di atas. Admin dapat melihat seluruh kelompok.</p>
+    </div>
+  </div>
+
+  <footer class="appfoot">Made By <span>Suryana</span></footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <h3>Hapus Notulen?</h3>
+    <p>Tindakan ini tidak dapat dibatalkan. Catatan yang dihapus akan hilang permanen.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="btnCancelDel">Batal</button>
+      <button class="btn btn-danger" id="btnConfirmDel">Ya, Hapus</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="adminModal">
+  <div class="modal-box">
+    <h3>Masuk sebagai Admin</h3>
+    <p>Masukkan PIN Admin untuk melihat dan mengelola notulen dari <b>seluruh kelompok</b>.</p>
+    <input type="password" inputmode="numeric" maxlength="10" class="pin-input" id="adminPinInput" placeholder="••••••">
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="btnCancelAdmin">Batal</button>
+      <button class="btn btn-primary" id="btnSubmitAdmin">Masuk</button>
+    </div>
+  </div>
+</div>
+
+<div id="pdf-render-area"></div>
+
+<script>
+/* =========================================================
+   KONFIGURASI FIREBASE
+   Ganti nilai di bawah ini dengan Database URL project
+   Firebase Realtime Database milik Anda (lihat panduan setup).
+   Contoh: "https://notulen-5-unsur-default-rtdb.asia-southeast1.firebasedatabase.app"
+   Jika dibiarkan kosong, aplikasi tetap jalan dalam mode OFFLINE
+   (data hanya tersimpan di browser ini, tidak tersinkron).
+   ========================================================= */
+const FIREBASE_DB_URL = "https://sosialisasi-5992c-default-rtdb.asia-southeast1.firebasedatabase.app";
+const FIREBASE_NODE = "notulen5unsur";
+
+const FIREBASE_ENABLED = /^https?:\/\//.test(FIREBASE_DB_URL);
+
+function fbPath(suffix){
+  return `${FIREBASE_DB_URL.replace(/\/$/,'')}/${FIREBASE_NODE}${suffix}.json`;
+}
+
+async function fbFetchAll(){
+  const res = await fetch(fbPath(''));
+  if(!res.ok) throw new Error('Firebase GET gagal: ' + res.status);
+  const obj = await res.json();
+  if(!obj) return [];
+  return Object.values(obj);
+}
+
+async function fbSetRecord(id, record){
+  const res = await fetch(fbPath('/' + id), {
+    method: 'PUT',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(record)
+  });
+  if(!res.ok) throw new Error('Firebase SET gagal: ' + res.status);
+}
+
+async function fbDeleteRecord(id){
+  const res = await fetch(fbPath('/' + id), { method: 'DELETE' });
+  if(!res.ok) throw new Error('Firebase DELETE gagal: ' + res.status);
+}
+
+let isOnline = false;
+function renderSyncStatus(){
+  const el = document.getElementById('syncStatus');
+  if(!el) return;
+  if(!FIREBASE_ENABLED){
+    el.innerHTML = `<span class="dot"></span>Mode Lokal (Firebase belum disambungkan)`;
+    el.className = 'admin-badge';
+  } else if(isOnline){
+    el.innerHTML = `<span class="dot"></span>Tersambung &middot; Data Sinkron`;
+    el.className = 'admin-badge is-admin';
+  } else {
+    el.innerHTML = `<span class="dot"></span>Offline &middot; Data Lokal Sementara`;
+    el.className = 'admin-badge';
+  }
+}
+
+const KELOMPOK_LIST = ["Tarjun","Serongga","Blok D","SP","Sampanahan","Gunung Ulin","Rampa","Manshurin","Kopen","Teluk Aru"];
+
+const STORAGE_KEY = "notulen5unsur_data_v1";
+const META_KEY = "notulen5unsur_meta_v1";
+const ADMIN_SESSION_KEY = "notulen5unsur_admin_session";
+const ADMIN_PIN = "159753";
+
+let state = {
+  selectedKelompok: null,
+  editingId: null,
+  filter: "ALL",
+  data: [],
+  pendingDeleteId: null,
+  isAdmin: sessionStorage.getItem(ADMIN_SESSION_KEY) === "1"
+};
+
+/* ---------- Admin access control ---------- */
+function renderAdminBar(){
+  const bar = document.getElementById('adminBar');
+  if(state.isAdmin){
+    bar.innerHTML = `
+      <div class="admin-badge" id="syncStatus"><span class="dot"></span>Memuat...</div>
+      <div class="admin-badge is-admin"><span class="dot"></span>Mode Admin &middot; Semua Kelompok</div>
+      <button id="btnAdminLogout">Keluar</button>
+    `;
+    document.getElementById('btnAdminLogout').onclick = logoutAdmin;
+  } else {
+    bar.innerHTML = `
+      <div class="admin-badge" id="syncStatus"><span class="dot"></span>Memuat...</div>
+      <div class="admin-badge">Mode Kelompok</div>
+      <button id="btnAdminLogin">Masuk sebagai Admin</button>
+    `;
+    document.getElementById('btnAdminLogin').onclick = openAdminModal;
+  }
+  renderSyncStatus();
+}
+
+function openAdminModal(){
+  document.getElementById('adminPinInput').value = "";
+  document.getElementById('adminModal').classList.add('show');
+  setTimeout(()=>document.getElementById('adminPinInput').focus(), 50);
+}
+function closeAdminModal(){
+  document.getElementById('adminModal').classList.remove('show');
+}
+document.getElementById('btnCancelAdmin').onclick = closeAdminModal;
+document.getElementById('btnSubmitAdmin').onclick = submitAdminPin;
+document.getElementById('adminPinInput').addEventListener('keydown', e=>{
+  if(e.key === 'Enter') submitAdminPin();
+});
+function submitAdminPin(){
+  const val = document.getElementById('adminPinInput').value.trim();
+  if(val === ADMIN_PIN){
+    state.isAdmin = true;
+    sessionStorage.setItem(ADMIN_SESSION_KEY, "1");
+    closeAdminModal();
+    toast("Berhasil masuk sebagai Admin");
+    renderAdminBar();
+    state.filter = "ALL";
+    renderFilterPills();
+    renderEntryList();
+  } else {
+    toast("PIN salah, coba lagi");
+  }
+}
+function logoutAdmin(){
+  state.isAdmin = false;
+  sessionStorage.removeItem(ADMIN_SESSION_KEY);
+  toast("Keluar dari Mode Admin");
+  renderAdminBar();
+  state.filter = state.selectedKelompok || "ALL";
+  renderFilterPills();
+  renderEntryList();
+}
+
+function loadLocalCache(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    state.data = raw ? JSON.parse(raw) : [];
+  }catch(e){ state.data = []; }
+}
+function cacheLocal(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
+}
+
+async function loadData(){
+  loadLocalCache();
+  try{
+    const meta = JSON.parse(localStorage.getItem(META_KEY) || "{}");
+    if(meta.tgl) document.getElementById('tglMusyawarah').value = meta.tgl;
+  }catch(e){}
+
+  if(!FIREBASE_ENABLED){
+    isOnline = false;
+    return;
+  }
+  try{
+    state.data = await fbFetchAll();
+    state.data.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    cacheLocal();
+    isOnline = true;
+  }catch(e){
+    isOnline = false;
+    toast("Gagal terhubung ke Firebase, memakai data lokal");
+  }
+}
+
+async function refreshFromFirebase(silent){
+  if(!FIREBASE_ENABLED) return;
+  // jangan ganggu saat sedang mengetik di form
+  const active = document.activeElement;
+  const isTypingInForm = active && (active.closest('#formPanel'));
+  if(isTypingInForm) return;
+
+  try{
+    const fresh = await fbFetchAll();
+    fresh.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    state.data = fresh;
+    cacheLocal();
+    isOnline = true;
+    renderSyncStatus();
+    renderKelompokGrid();
+    renderFilterPills();
+    renderEntryList();
+    if(!silent) toast("Data tersinkron");
+  }catch(e){
+    isOnline = false;
+    renderSyncStatus();
+    if(!silent) toast("Gagal sinkron, periksa koneksi internet");
+  }
+}
+
+function saveMeta(){
+  localStorage.setItem(META_KEY, JSON.stringify({
+    tgl: document.getElementById('tglMusyawarah').value
+  }));
+}
+document.getElementById('tglMusyawarah').addEventListener('input', saveMeta);
+
+function asArray(v){ return Array.isArray(v) ? v : (v ? [v] : []); }
+
+/* ---------- Dynamic repeatable rows (pembahasan / solusi / penanggung jawab) ---------- */
+function addRow(containerId, tag, placeholder, value){
+  const container = document.getElementById(containerId);
+  const row = document.createElement('div');
+  row.className = 'dyn-row';
+  const el = document.createElement(tag);
+  el.className = 'dyn-input';
+  if(tag==='textarea') el.rows = 2;
+  else el.type = 'text';
+  el.placeholder = placeholder;
+  el.value = value || "";
+  const removeBtn = document.createElement('button');
+  removeBtn.type = 'button';
+  removeBtn.className = 'dyn-remove';
+  removeBtn.innerHTML = '&times;';
+  removeBtn.title = 'Hapus baris ini';
+  removeBtn.onclick = ()=>{
+    if(container.children.length > 1){ row.remove(); }
+    else { el.value = ''; }
+  };
+  row.appendChild(el);
+  row.appendChild(removeBtn);
+  container.appendChild(row);
+  return el;
+}
+
+function resetRows(containerId, tag, placeholder){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  addRow(containerId, tag, placeholder);
+}
+
+function setRowValues(containerId, tag, placeholder, values){
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  const arr = asArray(values);
+  if(arr.length === 0){ addRow(containerId, tag, placeholder); return; }
+  arr.forEach(v=>addRow(containerId, tag, placeholder, v));
+}
+
+function getRowValues(containerId){
+  const container = document.getElementById(containerId);
+  return [...container.querySelectorAll('.dyn-input')].map(el=>el.value.trim()).filter(v=>v.length>0);
+}
+
+const PH_PEMBAHASAN = "Uraikan satu pokok pembahasan / permasalahan...";
+const PH_SOLUSI = "Uraikan satu solusi atau kesepakatan...";
+const PH_PJ = "Nama penanggung jawab pelaksanaan solusi ini";
+
+document.getElementById('btnAddPembahasan').onclick = ()=>addRow('pembahasanRows','textarea',PH_PEMBAHASAN);
+document.getElementById('btnAddSolusi').onclick = ()=>addRow('solusiRows','textarea',PH_SOLUSI);
+document.getElementById('btnAddPJ').onclick = ()=>addRow('pjRows','input',PH_PJ);
+
+function uid(){ return 'n' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+function fmtDate(d){
+  if(!d) return "–";
+  const dt = new Date(d + 'T00:00:00');
+  if(isNaN(dt)) return d;
+  return dt.toLocaleDateString('id-ID', {day:'2-digit', month:'long', year:'numeric'});
+}
+
+/* ---------- Render kelompok buttons ---------- */
+function renderKelompokGrid(){
+  const grid = document.getElementById('kelompokGrid');
+  grid.innerHTML = "";
+  KELOMPOK_LIST.forEach(k=>{
+    const btn = document.createElement('button');
+    btn.className = 'kel-btn' + (state.selectedKelompok===k ? ' active' : '');
+    let countHtml = "";
+    if(state.isAdmin){
+      const count = state.data.filter(d=>d.kelompok===k).length;
+      countHtml = `<span class="count">${count} notulen</span>`;
+    }
+    btn.innerHTML = `${k}${countHtml}`;
+    btn.onclick = ()=>selectKelompok(k);
+    grid.appendChild(btn);
+  });
+}
+
+function selectKelompok(k){
+  state.selectedKelompok = k;
+  state.editingId = null;
+  document.getElementById('formPanel').style.display = 'block';
+  document.getElementById('formKelName').textContent = k;
+  document.getElementById('btnCancelEdit').style.display = 'none';
+  clearForm(false);
+  renderKelompokGrid();
+  if(!state.isAdmin){ state.filter = k; }
+  renderFilterPills();
+  renderEntryList();
+  document.getElementById('formPanel').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function clearForm(withToast){
+  document.getElementById('fNotulis').value = "";
+  resetRows('pembahasanRows','textarea',PH_PEMBAHASAN);
+  resetRows('solusiRows','textarea',PH_SOLUSI);
+  resetRows('pjRows','input',PH_PJ);
+  document.getElementById('fBatasWaktu').value = "";
+  if(withToast) toast("Form dibersihkan");
+}
+
+document.getElementById('btnClearForm').onclick = ()=>clearForm(true);
+
+document.getElementById('btnSave').onclick = async ()=>{
+  if(!state.selectedKelompok){ toast("Pilih kelompok terlebih dahulu"); return; }
+  const notulis = document.getElementById('fNotulis').value.trim();
+  const pembahasan = getRowValues('pembahasanRows');
+  const solusi = getRowValues('solusiRows');
+  const pj = getRowValues('pjRows');
+  const batas = document.getElementById('fBatasWaktu').value;
+
+  if(!notulis || pembahasan.length===0 || solusi.length===0 || pj.length===0){
+    toast("Lengkapi semua isian sebelum menyimpan");
+    return;
+  }
+
+  const btn = document.getElementById('btnSave');
+  btn.disabled = true;
+  btn.textContent = 'Menyimpan...';
+
+  let recordToSync;
+  const wasEditing = !!state.editingId;
+
+  if(state.editingId){
+    const rec = state.data.find(d=>d.id===state.editingId);
+    if(rec){
+      rec.notulis = notulis; rec.pembahasan = pembahasan; rec.solusi = solusi;
+      rec.penanggungJawab = pj; rec.batasWaktu = batas;
+      rec.updatedAt = Date.now();
+      recordToSync = rec;
+    }
+    state.editingId = null;
+    document.getElementById('btnCancelEdit').style.display = 'none';
+  } else {
+    recordToSync = {
+      id: uid(),
+      kelompok: state.selectedKelompok,
+      notulis, pembahasan, solusi,
+      penanggungJawab: pj,
+      batasWaktu: batas,
+      createdAt: Date.now()
+    };
+    state.data.unshift(recordToSync);
+  }
+
+  cacheLocal();
+
+  if(FIREBASE_ENABLED && recordToSync){
+    try{
+      await fbSetRecord(recordToSync.id, recordToSync);
+      isOnline = true;
+      toast(wasEditing ? "Notulen berhasil diperbarui & tersinkron" : "Notulen tersimpan & tersinkron untuk " + recordToSync.kelompok);
+    }catch(e){
+      isOnline = false;
+      toast("Tersimpan lokal, tapi gagal sinkron ke Firebase (cek koneksi)");
+    }
+  } else {
+    toast(wasEditing ? "Notulen berhasil diperbarui (lokal)" : "Notulen tersimpan (lokal) untuk " + recordToSync.kelompok);
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Simpan Notulen';
+  renderSyncStatus();
+  clearForm(false);
+  renderKelompokGrid();
+  renderFilterPills();
+  renderEntryList();
+};
+
+document.getElementById('btnCancelEdit').onclick = ()=>{
+  state.editingId = null;
+  document.getElementById('btnCancelEdit').style.display = 'none';
+  clearForm(false);
+  toast("Edit dibatalkan");
+};
+
+/* ---------- Filter pills ---------- */
+function renderFilterPills(){
+  const box = document.getElementById('filterPills');
+  const lockWrap = document.getElementById('lockNoteWrap');
+
+  if(!state.isAdmin){
+    box.innerHTML = "";
+    lockWrap.innerHTML = state.selectedKelompok
+      ? `<div class="lock-note">🔒 Anda melihat notulen milik <b>${escapeHtml(state.selectedKelompok)}</b> saja. Masuk sebagai <b>Admin</b> untuk melihat seluruh kelompok.</div>`
+      : `<div class="lock-note">🔒 Pilih kelompok Anda di atas untuk melihat notulen kelompok Anda. Masuk sebagai <b>Admin</b> untuk melihat seluruh kelompok.</div>`;
+    return;
+  }
+
+  lockWrap.innerHTML = "";
+  const groupsWithData = [...new Set(state.data.map(d=>d.kelompok))];
+  let html = `<button class="pill ${state.filter==='ALL'?'active':''}" data-f="ALL">Semua</button>`;
+  KELOMPOK_LIST.forEach(k=>{
+    if(groupsWithData.includes(k)){
+      html += `<button class="pill ${state.filter===k?'active':''}" data-f="${k}">${k}</button>`;
+    }
+  });
+  box.innerHTML = html;
+  box.querySelectorAll('.pill').forEach(p=>{
+    p.onclick = ()=>{ state.filter = p.dataset.f; renderFilterPills(); renderEntryList(); };
+  });
+}
+
+/* ---------- Entry list ---------- */
+function renderEntryList(){
+  const list = document.getElementById('entryList');
+  const empty = document.getElementById('emptyState');
+  const locked = document.getElementById('accessLocked');
+
+  if(!state.isAdmin && !state.selectedKelompok){
+    list.innerHTML = "";
+    empty.style.display = 'none';
+    locked.style.display = 'block';
+    document.getElementById('totalCount').textContent = 0;
+    return;
+  }
+  locked.style.display = 'none';
+
+  const filtered = state.isAdmin
+    ? (state.filter==='ALL' ? state.data : state.data.filter(d=>d.kelompok===state.filter))
+    : state.data.filter(d=>d.kelompok===state.selectedKelompok);
+
+  document.getElementById('totalCount').textContent = state.isAdmin ? state.data.length : filtered.length;
+
+  if(filtered.length===0){
+    list.innerHTML = "";
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  list.innerHTML = filtered.map((d,i)=>`
+    <div class="entry">
+      <div class="entry-head">
+        <div>
+          <div class="entry-kel">${escapeHtml(d.kelompok)}</div>
+          <div class="entry-meta">Notulis: ${escapeHtml(d.notulis)} &middot; Dicatat ${new Date(d.createdAt).toLocaleDateString('id-ID')}</div>
+        </div>
+        <div class="entry-idx">#${String(filtered.length-i).padStart(3,'0')}</div>
+      </div>
+      <div class="entry-grid">
+        <div class="entry-block">
+          <div class="k">Pembahasan</div>
+          <div class="v">${renderListBlock(d.pembahasan)}</div>
+        </div>
+        <div class="entry-block">
+          <div class="k">Solusi Permasalahan</div>
+          <div class="v">${renderListBlock(d.solusi)}</div>
+        </div>
+        <div class="entry-block">
+          <div class="k">Penanggung Jawab</div>
+          <div class="v">${renderListBlock(d.penanggungJawab)}</div>
+        </div>
+        <div class="entry-block">
+          <div class="k">Batas Waktu Pelaksanaan</div>
+          <div class="v">${fmtDate(d.batasWaktu)}</div>
+        </div>
+      </div>
+      <div class="entry-actions">
+        <button onclick="editEntry('${d.id}')">✎ Edit</button>
+        <button class="del" onclick="askDelete('${d.id}')">🗑 Hapus</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function escapeHtml(s){
+  return String(s||"").replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function renderListBlock(v){
+  const arr = asArray(v);
+  if(arr.length===0) return '<span style="color:#B9AF92;">–</span>';
+  if(arr.length===1) return escapeHtml(arr[0]);
+  return '<ol style="margin:0; padding-left:18px;">' + arr.map(a=>`<li style="margin-bottom:2px;">${escapeHtml(a)}</li>`).join('') + '</ol>';
+}
+
+function editEntry(id){
+  const rec = state.data.find(d=>d.id===id);
+  if(!rec) return;
+  state.selectedKelompok = rec.kelompok;
+  state.editingId = id;
+  document.getElementById('formPanel').style.display = 'block';
+  document.getElementById('formKelName').textContent = rec.kelompok;
+  document.getElementById('fNotulis').value = rec.notulis;
+  setRowValues('pembahasanRows','textarea',PH_PEMBAHASAN, rec.pembahasan);
+  setRowValues('solusiRows','textarea',PH_SOLUSI, rec.solusi);
+  setRowValues('pjRows','input',PH_PJ, rec.penanggungJawab);
+  document.getElementById('fBatasWaktu').value = rec.batasWaktu || "";
+  document.getElementById('btnCancelEdit').style.display = 'inline-flex';
+  renderKelompokGrid();
+  document.getElementById('formPanel').scrollIntoView({behavior:'smooth', block:'start'});
+  toast("Mode edit — ubah lalu klik Simpan Notulen");
+}
+
+function askDelete(id){
+  state.pendingDeleteId = id;
+  document.getElementById('confirmModal').classList.add('show');
+}
+document.getElementById('btnCancelDel').onclick = ()=>{
+  state.pendingDeleteId = null;
+  document.getElementById('confirmModal').classList.remove('show');
+};
+document.getElementById('btnConfirmDel').onclick = async ()=>{
+  const idToDelete = state.pendingDeleteId;
+  state.data = state.data.filter(d=>d.id!==idToDelete);
+  cacheLocal();
+  document.getElementById('confirmModal').classList.remove('show');
+
+  if(FIREBASE_ENABLED){
+    try{
+      await fbDeleteRecord(idToDelete);
+      isOnline = true;
+      toast("Notulen dihapus & tersinkron");
+    }catch(e){
+      isOnline = false;
+      toast("Dihapus lokal, tapi gagal sinkron ke Firebase (cek koneksi)");
+    }
+  } else {
+    toast("Notulen dihapus (lokal)");
+  }
+  renderSyncStatus();
+  renderKelompokGrid();
+  renderFilterPills();
+  renderEntryList();
+};
+
+/* ---------- CSV Export ---------- */
+document.getElementById('btnExportCsv').onclick = ()=>{
+  if(!state.isAdmin && !state.selectedKelompok){ toast("Pilih kelompok Anda terlebih dahulu"); return; }
+  const exportData = state.isAdmin ? state.data : state.data.filter(d=>d.kelompok===state.selectedKelompok);
+  if(exportData.length===0){ toast("Belum ada data untuk diexport"); return; }
+  const rows = [["Kelompok","Notulis","Pembahasan","Solusi","Penanggung Jawab","Batas Waktu","Tanggal Dicatat"]];
+  exportData.forEach(d=>{
+    rows.push([d.kelompok, d.notulis, asArray(d.pembahasan).join(' | '), asArray(d.solusi).join(' | '), asArray(d.penanggungJawab).join(' | '), fmtDate(d.batasWaktu), new Date(d.createdAt).toLocaleDateString('id-ID')]);
+  });
+  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const blob = new Blob(["\uFEFF"+csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `notulen-musyawarah-5unsur-${state.isAdmin ? 'semua-kelompok' : state.selectedKelompok.replace(/\s+/g,'-').toLowerCase()}-${todayStr()}.csv`;
+  a.click();
+  toast("CSV berhasil diunduh");
+};
+
+function todayStr(){
+  const t = new Date();
+  return t.toISOString().slice(0,10);
+}
+
+/* ---------- PDF Export ---------- */
+document.getElementById('btnExportPdf').onclick = async ()=>{
+  if(!state.isAdmin && !state.selectedKelompok){ toast("Pilih kelompok Anda terlebih dahulu"); return; }
+  const exportData = state.isAdmin ? state.data : state.data.filter(d=>d.kelompok===state.selectedKelompok);
+  if(exportData.length===0){ toast("Belum ada data untuk diexport"); return; }
+  toast("Menyiapkan PDF...");
+
+  const tgl = document.getElementById('tglMusyawarah').value;
+
+  const groups = {};
+  const kelompokScope = state.isAdmin ? KELOMPOK_LIST : [state.selectedKelompok];
+  kelompokScope.forEach(k=>{ groups[k] = exportData.filter(d=>d.kelompok===k); });
+
+  let groupsHtml = "";
+  Object.keys(groups).forEach(k=>{
+    if(groups[k].length===0) return;
+    groupsHtml += `<div class="pdf-group">
+      <div class="pdf-group-title">Kelompok: ${escapeHtml(k)}</div>`;
+    groups[k].forEach((d,i)=>{
+      groupsHtml += `
+        <div class="pdf-entry">
+          <div class="pdf-entry-head">Notulen ${i+1} &middot; Notulis: ${escapeHtml(d.notulis)}</div>
+          <table class="pdf-table">
+            <tr><td class="pk">Pembahasan</td><td>${renderListBlock(d.pembahasan)}</td></tr>
+            <tr><td class="pk">Solusi Permasalahan</td><td>${renderListBlock(d.solusi)}</td></tr>
+            <tr><td class="pk">Penanggung Jawab</td><td>${renderListBlock(d.penanggungJawab)}</td></tr>
+            <tr><td class="pk">Batas Waktu Pelaksanaan</td><td>${fmtDate(d.batasWaktu)}</td></tr>
+          </table>
+        </div>`;
+    });
+    groupsHtml += `</div>`;
+  });
+
+  const renderArea = document.getElementById('pdf-render-area');
+  renderArea.innerHTML = `
+    <style>
+      .pdf-doc{font-family:'Inter',sans-serif; color:#20261F; padding:46px 50px; width:794px;}
+      .pdf-head{border-bottom:3px solid #B8892B; padding-bottom:14px; margin-bottom:18px;}
+      .pdf-eyebrow{font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:#0E4A44;}
+      .pdf-title{font-family:'Lora',serif; font-weight:700; font-size:24px; color:#0B3834; margin:4px 0 10px;}
+      .pdf-meta{display:flex; gap:26px; font-size:12px; color:#4A4536; flex-wrap:wrap;}
+      .pdf-meta b{color:#0B3834;}
+      .pdf-group{margin-bottom:20px; page-break-inside:avoid;}
+      .pdf-group-title{
+        font-family:'Lora',serif; font-weight:700; font-size:15px; color:#fff;
+        background:#0E4A44; padding:6px 12px; border-radius:4px; margin-bottom:10px;
+      }
+      .pdf-entry{border:1px solid #D8CFB8; border-left:4px solid #B8892B; border-radius:6px; padding:12px 14px; margin-bottom:10px; page-break-inside:avoid;}
+      .pdf-entry-head{font-size:11.5px; font-weight:600; color:#0B3834; margin-bottom:8px; font-family:'JetBrains Mono',monospace;}
+      .pdf-table{width:100%; border-collapse:collapse; font-size:12px;}
+      .pdf-table td{padding:5px 6px; vertical-align:top; border-bottom:1px solid #EFEADB;}
+      .pdf-table td.pk{width:170px; font-weight:600; color:#0E4A44; font-size:10.5px; text-transform:uppercase; letter-spacing:.04em;}
+      .pdf-foot{margin-top:24px; padding-top:12px; border-top:1px solid #D8CFB8; text-align:center; font-family:'JetBrains Mono',monospace; font-size:10.5px; color:#8B8368;}
+      .pdf-foot span{color:#B8892B; font-weight:600;}
+    </style>
+    <div class="pdf-doc" id="pdfDocInner">
+      <div class="pdf-head">
+        <div class="pdf-eyebrow">Dokumen Internal &middot; Musyawarah 5 Unsur</div>
+        <div class="pdf-title">Notulen Musyawarah 5 Unsur</div>
+        <div class="pdf-meta">
+          <div>Tanggal: <b>${tgl ? fmtDate(tgl) : '-'}</b></div>
+        </div>
+      </div>
+      ${groupsHtml}
+      <div class="pdf-foot">Dokumen ini dihasilkan otomatis &middot; Made By <span>Suryana</span></div>
+    </div>
+  `;
+
+  await new Promise(r=>setTimeout(r, 150));
+
+  const inner = document.getElementById('pdfDocInner');
+  const canvas = await html2canvas(inner, {scale:2, backgroundColor:'#ffffff', useCORS:true});
+  const imgData = canvas.toDataURL('image/png');
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p','mm','a4');
+  const pageWidth = 210, pageHeight = 297;
+  const imgWidth = pageWidth;
+  const imgHeight = canvas.height * imgWidth / canvas.width;
+
+  let heightLeft = imgHeight;
+  let position = 0;
+  pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+  heightLeft -= pageHeight;
+
+  while(heightLeft > 0){
+    position = heightLeft - imgHeight;
+    pdf.addPage();
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+  }
+
+  // footer watermark on every page
+  const pageCount = pdf.internal.getNumberOfPages();
+  for(let i=1;i<=pageCount;i++){
+    pdf.setPage(i);
+    pdf.setFontSize(8);
+    pdf.setTextColor(150,140,110);
+    pdf.text(`Made By Suryana  ·  Halaman ${i} dari ${pageCount}`, pageWidth/2, pageHeight-6, {align:'center'});
+  }
+
+  pdf.save(`notulen-musyawarah-5unsur-${state.isAdmin ? 'semua-kelompok' : state.selectedKelompok.replace(/\s+/g,'-').toLowerCase()}-${todayStr()}.pdf`);
+  renderArea.innerHTML = "";
+  toast("PDF berhasil diunduh");
+};
+
+document.getElementById('btnRefresh').onclick = ()=>refreshFromFirebase(false);
+
+/* ---------- init ---------- */
+(async function init(){
+  resetRows('pembahasanRows','textarea',PH_PEMBAHASAN);
+  resetRows('solusiRows','textarea',PH_SOLUSI);
+  resetRows('pjRows','input',PH_PJ);
+  renderAdminBar();
+
+  await loadData();
+
+  state.filter = state.isAdmin ? "ALL" : (state.selectedKelompok || "ALL");
+  renderSyncStatus();
+  renderKelompokGrid();
+  renderFilterPills();
+  renderEntryList();
+
+  if(!document.getElementById('tglMusyawarah').value){
+    document.getElementById('tglMusyawarah').value = todayStr();
+    saveMeta();
+  }
+
+  if(FIREBASE_ENABLED){
+    setInterval(()=>refreshFromFirebase(true), 7000);
+  }
+})();
+</script>
+</body>
+</html>
