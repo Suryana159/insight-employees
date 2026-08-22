@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daftar Hadir KBM TPA</title>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal-950:#062b28; --teal-900:#0b3d38; --teal-800:#0f5851; --teal-700:#137a6f;
+    --teal-600:#189688; --teal-500:#20b3a0; --teal-100:#e3f5f2; --teal-50:#f2fbf9;
+    --gold-600:#b8860b; --gold-500:#d4a017; --gold-400:#e6b83a; --gold-100:#fbeec7;
+    --ink-900:#1b2422; --ink-600:#4d5c58; --ink-400:#8a9c97;
+    --bg:#f5f8f7; --card:#ffffff; --line:#dfeae7;
+    --danger:#c0392b; --warn:#b8860b; --ok:#1e8a5f;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink-900);padding-bottom:70px;}
+  h1,h2,h3,.brand{font-family:'Poppins',sans-serif;}
+  header.app-header{
+    background:linear-gradient(120deg,var(--teal-900) 0%,var(--teal-700) 55%,var(--teal-600) 100%);
+    color:#fff;padding:22px 18px 60px;position:relative;overflow:hidden;
+  }
+  header.app-header::after{
+    content:"";position:absolute;right:-40px;bottom:-60px;width:220px;height:220px;border-radius:50%;
+    background:radial-gradient(circle,rgba(212,160,23,.35),transparent 70%);
+  }
+  header.app-header::before{
+    content:"";position:absolute;left:-60px;top:-60px;width:180px;height:180px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,255,255,.08),transparent 70%);
+  }
+  .header-inner{position:relative;z-index:1;max-width:980px;margin:0 auto;}
+  .eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--gold-100);background:rgba(255,255,255,.12);padding:5px 12px;border-radius:999px;font-weight:600;}
+  header.app-header h1{font-size:26px;margin:12px 0 4px;font-weight:800;}
+  header.app-header p{margin:0;color:#dff3ef;font-size:13.5px;}
+
+  .wrap{max-width:980px;margin:-38px auto 0;padding:0 14px 30px;position:relative;z-index:2;}
+  nav.tabs{display:flex;gap:6px;background:var(--card);border-radius:16px;padding:6px;box-shadow:0 10px 30px -14px rgba(6,43,40,.25);overflow-x:auto;}
+  nav.tabs button{
+    flex:1;white-space:nowrap;border:none;background:transparent;padding:12px 10px;border-radius:11px;
+    font-family:'Poppins',sans-serif;font-weight:600;font-size:13px;color:var(--ink-600);cursor:pointer;transition:.15s;
+  }
+  nav.tabs button.active{background:var(--teal-800);color:#fff;box-shadow:0 6px 14px -6px rgba(11,61,56,.5);}
+  nav.tabs button:not(.active):hover{background:var(--teal-50);color:var(--teal-800);}
+
+  .card{background:var(--card);border-radius:16px;padding:20px;margin-top:16px;box-shadow:0 6px 20px -14px rgba(6,43,40,.18);border:1px solid var(--line);}
+  .card h2{font-size:17px;margin:0 0 4px;color:var(--teal-900);display:flex;align-items:center;gap:8px;}
+  .card .sub{font-size:12.5px;color:var(--ink-400);margin:0 0 16px;}
+
+  .grid{display:grid;gap:12px;}
+  .grid.cols-2{grid-template-columns:1fr 1fr;}
+  .grid.cols-3{grid-template-columns:1fr 1fr 1fr;}
+  @media(max-width:640px){.grid.cols-2,.grid.cols-3{grid-template-columns:1fr;}}
+
+  label{font-size:12px;font-weight:600;color:var(--ink-600);display:block;margin-bottom:5px;}
+  input[type=text],input[type=date],input[type=month],input[type=password],select{
+    width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:14px;
+    font-family:'Inter',sans-serif;background:#fcfdfd;color:var(--ink-900);
+  }
+  input:focus,select:focus{outline:none;border-color:var(--teal-500);box-shadow:0 0 0 3px rgba(32,179,160,.15);}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:10px;
+    font-family:'Poppins',sans-serif;font-weight:600;font-size:13.5px;border:none;cursor:pointer;transition:.15s;}
+  .btn-primary{background:var(--teal-700);color:#fff;}
+  .btn-primary:hover{background:var(--teal-800);}
+  .btn-gold{background:var(--gold-500);color:#3a2a00;}
+  .btn-gold:hover{background:var(--gold-600);color:#fff;}
+  .btn-outline{background:#fff;border:1.5px solid var(--line);color:var(--ink-600);}
+  .btn-outline:hover{border-color:var(--teal-500);color:var(--teal-800);}
+  .btn-danger{background:#fdeceb;color:var(--danger);}
+  .btn-danger:hover{background:var(--danger);color:#fff;}
+  .btn-sm{padding:6px 11px;font-size:12px;border-radius:8px;}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);}
+  th{background:var(--teal-50);color:var(--teal-900);font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.02em;}
+  tr:hover td{background:#fafefd;}
+  .table-scroll{overflow-x:auto;border-radius:12px;border:1px solid var(--line);}
+
+  .pill{display:inline-block;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;}
+  .pill-h{background:#e3f6ec;color:var(--ok);}
+  .pill-i{background:#fff3d6;color:var(--warn);}
+  .pill-a{background:#fdeceb;color:var(--danger);}
+  .pill-none{background:#eef1f0;color:var(--ink-400);}
+
+  .status-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  .status-btn{flex:1;min-width:80px;padding:8px 6px;border-radius:9px;border:1.5px solid var(--line);background:#fff;
+    font-size:12px;font-weight:700;cursor:pointer;text-align:center;color:var(--ink-600);}
+  .status-btn.sel-h{background:var(--ok);border-color:var(--ok);color:#fff;}
+  .status-btn.sel-i{background:var(--gold-500);border-color:var(--gold-500);color:#3a2a00;}
+  .status-btn.sel-a{background:var(--danger);border-color:var(--danger);color:#fff;}
+
+  .santri-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px dashed var(--line);}
+  .santri-row:last-child{border-bottom:none;}
+  .santri-name{font-weight:600;font-size:13.5px;}
+  .santri-meta{font-size:11px;color:var(--ink-400);}
+
+  .badge-count{display:inline-flex;gap:8px;font-size:11.5px;color:var(--ink-600);margin-top:2px;}
+  .footer-credit{text-align:center;font-size:11.5px;color:var(--ink-400);padding:16px 0 4px;font-family:'Poppins',sans-serif;letter-spacing:.02em;}
+  .footer-credit b{color:var(--teal-700);}
+
+  .fixed-footer{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.94);backdrop-filter:blur(6px);
+    border-top:1px solid var(--line);text-align:center;padding:9px 0;font-size:11.5px;color:var(--ink-400);
+    font-family:'Poppins',sans-serif;z-index:50;}
+  .fixed-footer b{color:var(--teal-700);}
+
+  .empty{text-align:center;padding:30px 10px;color:var(--ink-400);font-size:13px;}
+  .empty svg{opacity:.5;margin-bottom:8px;}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(6,20,18,.55);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;}
+  .modal-overlay.show{display:flex;}
+  .modal-box{background:#fff;border-radius:16px;padding:20px;max-width:520px;width:100%;max-height:85vh;overflow-y:auto;}
+  .modal-box h3{margin:0 0 4px;color:var(--teal-900);}
+  .modal-box .sub{font-size:12px;color:var(--ink-400);margin-bottom:14px;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .cal-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:8px;font-size:11px;background:#f4f7f6;}
+  .cal-cell .d{font-weight:700;font-size:12px;}
+  .cal-cell.h{background:#e3f6ec;color:var(--ok);}
+  .cal-cell.i{background:#fff3d6;color:var(--warn);}
+  .cal-cell.a{background:#fdeceb;color:var(--danger);}
+
+  .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--teal-900);color:#fff;
+    padding:11px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:200;box-shadow:0 10px 24px -8px rgba(0,0,0,.35);
+    opacity:0;pointer-events:none;transition:.25s;}
+  .toast.show{opacity:1;top:22px;}
+
+  .stat-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+  @media(max-width:640px){.stat-strip{grid-template-columns:repeat(2,1fr);}}
+  .stat-box{background:var(--teal-50);border:1px solid var(--teal-100);border-radius:12px;padding:12px;text-align:center;}
+  .stat-box .n{font-family:'Poppins',sans-serif;font-weight:800;font-size:19px;color:var(--teal-900);}
+  .stat-box .l{font-size:10.5px;color:var(--ink-400);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}
+
+  .tab-content{display:none;}
+  .tab-content.active{display:block;animation:fadein .25s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  .sync-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ink-400);margin-right:5px;}
+  .sync-dot.ok{background:var(--ok);}
+  .sync-dot.err{background:var(--danger);}
+
+  @media print{
+    header.app-header,nav.tabs,.no-print,.fixed-footer{display:none !important;}
+    body{background:#fff;padding-bottom:0;}
+    .wrap{margin-top:0;}
+    .card{box-shadow:none;border:1px solid #ccc;}
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-inner">
+    <span class="eyebrow">TPA &middot; Kegiatan Belajar Mengajar</span>
+    <h1>Daftar Hadir KBM TPA</h1>
+    <p>Pencatatan kehadiran santri per kelompok &amp; kelas, rekap bulanan otomatis.</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav class="tabs no-print">
+    <button class="tab-btn active" data-tab="santri">Data Santri</button>
+    <button class="tab-btn" data-tab="absensi">Absensi Harian</button>
+    <button class="tab-btn" data-tab="rekap">Rekap Bulanan</button>
+    <button class="tab-btn" data-tab="pengaturan">🔒 Pengaturan</button>
+  </nav>
+
+  <!-- TAB 1: DATA SANTRI -->
+  <div class="tab-content active" id="tab-santri">
+    <div class="card">
+      <h2>➕ Tambah Santri</h2>
+      <p class="sub">Daftarkan santri baru ke kelompok dan kelas KBM.</p>
+      <div class="grid cols-3">
+        <div>
+          <label>Nama Santri</label>
+          <input type="text" id="in-nama-santri" placeholder="Contoh: Ahmad Fauzan">
+        </div>
+        <div>
+          <label>Kelompok</label>
+          <select id="in-kelompok-santri"></select>
+        </div>
+        <div>
+          <label>Kelas</label>
+          <select id="in-kelas-santri"></select>
+        </div>
+      </div>
+      <div style="margin-top:14px;">
+        <button class="btn btn-primary" onclick="tambahSantri()">Tambah Santri</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>📋 Daftar Santri</h2>
+      <p class="sub">Semua santri terdaftar. Gunakan filter untuk mempersempit tampilan.</p>
+      <div class="grid cols-3" style="margin-bottom:14px;">
+        <div>
+          <label>Filter Kelompok</label>
+          <select id="filter-kelompok-santri" onchange="renderDaftarSantri()"></select>
+        </div>
+        <div>
+          <label>Filter Kelas</label>
+          <select id="filter-kelas-santri" onchange="renderDaftarSantri()"></select>
+        </div>
+        <div>
+          <label>Cari Nama</label>
+          <input type="text" id="search-santri" placeholder="Ketik nama..." oninput="renderDaftarSantri()">
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>No</th><th>Nama Santri</th><th>Kelompok</th><th>Kelas</th><th style="text-align:right;">Aksi</th></tr></thead>
+          <tbody id="tbody-santri"></tbody>
+        </table>
+      </div>
+      <div id="empty-santri" class="empty" style="display:none;">Belum ada santri pada filter ini.</div>
+    </div>
+    <p class="footer-credit">Made by <b>Suryana</b></p>
+  </div>
+
+  <!-- TAB 2: ABSENSI HARIAN -->
+  <div class="tab-content" id="tab-absensi">
+    <div class="card">
+      <h2>🗓️ Absensi Harian</h2>
+      <p class="sub">Pilih kelompok, kelas, dan tanggal untuk mengisi kehadiran santri.</p>
+      <div class="grid cols-3">
+        <div>
+          <label>Kelompok</label>
+          <select id="ab-kelompok" onchange="muatSantriAbsensi()"></select>
+        </div>
+        <div>
+          <label>Kelas</label>
+          <select id="ab-kelas" onchange="muatSantriAbsensi()"></select>
+        </div>
+        <div>
+          <label>Tanggal</label>
+          <input type="date" id="ab-tanggal" onchange="muatSantriAbsensi()">
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="card-absensi-list">
+      <h2>Daftar Kehadiran</h2>
+      <p class="sub" id="absensi-sub">Pilih kelompok &amp; kelas di atas untuk memuat santri.</p>
+      <div class="no-print" id="quick-actions" style="display:none;margin-bottom:12px;">
+        <button class="btn btn-outline btn-sm" onclick="tandaiSemua('H')">Tandai Semua Hadir</button>
+        <button class="btn btn-outline btn-sm" onclick="tandaiSemua('I')">Tandai Semua Izin</button>
+        <button class="btn btn-outline btn-sm" onclick="tandaiSemua('A')">Tandai Semua TK</button>
+      </div>
+      <div id="list-absensi"></div>
+      <div id="empty-absensi" class="empty">Belum ada data ditampilkan.</div>
+      <div style="margin-top:16px;" id="save-absensi-wrap" class="no-print" style="display:none;">
+        <button class="btn btn-primary" onclick="simpanAbsensi()">💾 Simpan Absensi Hari Ini</button>
+      </div>
+    </div>
+    <p class="footer-credit">Made by <b>Suryana</b></p>
+  </div>
+
+  <!-- TAB 3: REKAP BULANAN -->
+  <div class="tab-content" id="tab-rekap">
+    <div class="card no-print">
+      <h2>📊 Rekap Kehadiran Bulanan</h2>
+      <p class="sub">Rekap jumlah &amp; persentase kehadiran santri dalam satu bulan.</p>
+      <div class="grid cols-3">
+        <div>
+          <label>Kelompok</label>
+          <select id="rk-kelompok"></select>
+        </div>
+        <div>
+          <label>Kelas</label>
+          <select id="rk-kelas"></select>
+        </div>
+        <div>
+          <label>Bulan</label>
+          <input type="month" id="rk-bulan">
+        </div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="tampilkanRekap()">Tampilkan Rekap</button>
+        <button class="btn btn-gold" onclick="exportRekapPDF()">⬇ Export PDF</button>
+        <button class="btn btn-outline" onclick="window.print()">🖨 Cetak</button>
+      </div>
+    </div>
+
+    <div id="rekap-print-area">
+      <div class="card">
+        <h2 id="rekap-judul">Rekap Kehadiran</h2>
+        <p class="sub" id="rekap-periode">Belum ditampilkan.</p>
+        <div class="stat-strip" id="rekap-stats" style="display:none;">
+          <div class="stat-box"><div class="n" id="st-santri">0</div><div class="l">Santri</div></div>
+          <div class="stat-box"><div class="n" id="st-hadir">0</div><div class="l">Total Hadir</div></div>
+          <div class="stat-box"><div class="n" id="st-izin">0</div><div class="l">Total Izin</div></div>
+          <div class="stat-box"><div class="n" id="st-persen">0%</div><div class="l">Rata Kehadiran</div></div>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th>No</th><th>Nama Santri</th><th>Kelompok</th><th>Kelas</th>
+              <th>Hadir</th><th>Izin</th><th>TK</th><th>Tercatat</th><th>% Hadir</th>
+            </tr></thead>
+            <tbody id="tbody-rekap"></tbody>
+          </table>
+        </div>
+        <div id="empty-rekap" class="empty">Pilih filter lalu klik "Tampilkan Rekap".</div>
+      </div>
+    </div>
+    <p class="footer-credit">Made by <b>Suryana</b></p>
+  </div>
+
+  <!-- TAB 4: PENGATURAN -->
+  <div class="tab-content" id="tab-pengaturan">
+    <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+      <div>
+        <h2 style="margin-bottom:2px;">🔒 Halaman Khusus Admin</h2>
+        <p class="sub" style="margin:0;">Terbuka untuk sesi ini. Kunci kembali jika perangkat akan dipakai orang lain.</p>
+      </div>
+      <button class="btn btn-outline" onclick="kunciPengaturan()">Kunci Halaman Ini</button>
+    </div>
+
+    <div class="card">
+      <h2>☁️ Sinkronisasi Firebase (Opsional)</h2>
+      <p class="sub">Simpan &amp; muat data dari Firebase Realtime Database agar dapat diakses dari perangkat lain. Data selalu otomatis tersimpan di penyimpanan lokal perangkat ini sebagai cadangan.</p>
+      <div>
+        <label>Firebase Database URL</label>
+        <input type="text" id="fb-url" placeholder="https://nama-project-default-rtdb.firebaseio.com">
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <button class="btn btn-primary" onclick="simpanFirebaseUrl()">Simpan URL</button>
+        <button class="btn btn-outline" onclick="pushFirebase(true)">⬆ Sinkron ke Firebase</button>
+        <button class="btn btn-outline" onclick="pullFirebase()">⬇ Ambil dari Firebase</button>
+        <span style="font-size:12px;color:var(--ink-400);"><span class="sync-dot" id="sync-dot"></span><span id="sync-status">Belum tersinkron</span></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🔒 Keamanan Data</h2>
+      <p class="sub">PIN diperlukan untuk menghapus santri atau mereset data. PIN default: <b>159753</b></p>
+      <div class="grid cols-2">
+        <div>
+          <label>Ganti PIN Admin</label>
+          <input type="password" id="new-pin" placeholder="PIN baru (6 digit)">
+        </div>
+        <div style="align-self:end;">
+          <button class="btn btn-outline" onclick="gantiPIN()">Simpan PIN Baru</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>⚠️ Zona Berbahaya</h2>
+      <p class="sub">Tindakan berikut memerlukan PIN admin dan tidak dapat dibatalkan.</p>
+      <button class="btn btn-danger" onclick="resetSemuaData()">Reset Semua Data</button>
+    </div>
+    <p class="footer-credit">Made by <b>Suryana</b></p>
+  </div>
+</div>
+
+<div class="fixed-footer no-print">Daftar Hadir KBM TPA &nbsp;·&nbsp; Made by <b>Suryana</b></div>
+
+<!-- Modal detail kalender -->
+<div class="modal-overlay no-print" id="modal-detail">
+  <div class="modal-box">
+    <h3 id="modal-nama">Detail Kehadiran</h3>
+    <p class="sub" id="modal-periode"></p>
+    <div class="cal-grid" id="modal-cal"></div>
+    <div style="margin-top:16px;text-align:right;">
+      <button class="btn btn-outline" onclick="tutupModal()">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ DATA DASAR ============ */
+const KELOMPOK_LIST = ["Tarjun","Serongga","Blok D","SP","Sampanahan","Gunung Ulin","Rampa","Manshurin","Kopen","Teluk Aru"];
+const KELAS_LIST = ["Paud","Kelas 1","Kelas 2","Kelas 3","Kelas 4","Kelas 5","Kelas 6","Pra Remaja","Remaja","Usia Mandiri","Usia Nikah"];
+const STORAGE_KEY = "tpa_absensi_data_v1";
+const FB_KEY = "tpa_absensi_firebase_url";
+const PIN_KEY = "tpa_absensi_pin";
+const FB_NODE = "daftarHadirTPA";
+const DEFAULT_FB_URL = "https://employees-insight-default-rtdb.firebaseio.com";
+
+let DB = { santri: [], absensi: {} }; // absensi[santriId][YYYY-MM][day] = 'H'|'I'|'A'
+let pendingAbsensiState = {}; // santriId -> status, for the currently loaded day
+
+/* ============ PERSISTENSI LOKAL ============ */
+function loadLocal(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){ DB = JSON.parse(raw); if(!DB.santri) DB.santri=[]; if(!DB.absensi) DB.absensi={}; }
+  }catch(e){ console.error(e); }
+}
+function saveLocal(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(DB));
+}
+function getPIN(){ return localStorage.getItem(PIN_KEY) || "159753"; }
+
+/* ============ TOAST ============ */
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ============ TAB SWITCH ============ */
+let pengaturanUnlocked = false;
+
+function bukaTab(btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+}
+
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    if(btn.dataset.tab === 'pengaturan' && !pengaturanUnlocked){
+      const pin = prompt('Halaman Pengaturan khusus admin.\nMasukkan PIN admin:');
+      if(pin===null) return; // batal, tetap di tab semula
+      if(pin !== getPIN()){
+        showToast('PIN salah, akses ditolak');
+        return;
+      }
+      pengaturanUnlocked = true;
+      showToast('Akses Pengaturan dibuka');
+    }
+    bukaTab(btn);
+  });
+});
+
+/* ============ ISI DROPDOWN ============ */
+function fillSelect(el, arr, withAll){
+  el.innerHTML = "";
+  if(withAll){
+    const o = document.createElement('option'); o.value=""; o.textContent="Semua"; el.appendChild(o);
+  }
+  arr.forEach(v=>{
+    const o = document.createElement('option'); o.value=v; o.textContent=v; el.appendChild(o);
+  });
+}
+function initSelects(){
+  fillSelect(document.getElementById('in-kelompok-santri'), KELOMPOK_LIST, false);
+  fillSelect(document.getElementById('in-kelas-santri'), KELAS_LIST, false);
+  fillSelect(document.getElementById('filter-kelompok-santri'), KELOMPOK_LIST, true);
+  fillSelect(document.getElementById('filter-kelas-santri'), KELAS_LIST, true);
+  fillSelect(document.getElementById('ab-kelompok'), KELOMPOK_LIST, false);
+  fillSelect(document.getElementById('ab-kelas'), KELAS_LIST, false);
+  fillSelect(document.getElementById('rk-kelompok'), KELOMPOK_LIST, true);
+  fillSelect(document.getElementById('rk-kelas'), KELAS_LIST, true);
+
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById('ab-tanggal').value = today;
+  document.getElementById('rk-bulan').value = today.slice(0,7);
+}
+
+/* ============ TAB 1: DATA SANTRI ============ */
+function tambahSantri(){
+  const nama = document.getElementById('in-nama-santri').value.trim();
+  const kelompok = document.getElementById('in-kelompok-santri').value;
+  const kelas = document.getElementById('in-kelas-santri').value;
+  if(!nama){ showToast('Nama santri harus diisi'); return; }
+  const id = 's_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+  DB.santri.push({ id, nama, kelompok, kelas });
+  saveLocal();
+  document.getElementById('in-nama-santri').value = "";
+  document.getElementById('in-nama-santri').focus();
+  renderDaftarSantri();
+  showToast('Santri "'+nama+'" ditambahkan');
+}
+
+function renderDaftarSantri(){
+  const fk = document.getElementById('filter-kelompok-santri').value;
+  const fc = document.getElementById('filter-kelas-santri').value;
+  const q = document.getElementById('search-santri').value.trim().toLowerCase();
+  let list = DB.santri.filter(s =>
+    (!fk || s.kelompok===fk) && (!fc || s.kelas===fc) && (!q || s.nama.toLowerCase().includes(q))
+  );
+  list.sort((a,b)=> a.kelompok.localeCompare(b.kelompok) || a.kelas.localeCompare(b.kelas) || a.nama.localeCompare(b.nama));
+  const tbody = document.getElementById('tbody-santri');
+  const empty = document.getElementById('empty-santri');
+  tbody.innerHTML = "";
+  if(list.length===0){ empty.style.display='block'; return; }
+  empty.style.display='none';
+  list.forEach((s,idx)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${idx+1}</td><td>${escapeHtml(s.nama)}</td><td>${s.kelompok}</td><td>${s.kelas}</td>
+      <td style="text-align:right;">
+        <button class="btn btn-outline btn-sm" onclick="editSantri('${s.id}')">Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="hapusSantri('${s.id}')">Hapus</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function editSantri(id){
+  const s = DB.santri.find(x=>x.id===id);
+  if(!s) return;
+  const namaBaru = prompt('Nama santri:', s.nama);
+  if(namaBaru===null) return;
+  if(!namaBaru.trim()){ showToast('Nama tidak boleh kosong'); return; }
+  s.nama = namaBaru.trim();
+  saveLocal();
+  renderDaftarSantri();
+  showToast('Data santri diperbarui');
+}
+
+function hapusSantri(id){
+  const pin = prompt('Masukkan PIN admin untuk menghapus santri:');
+  if(pin===null) return;
+  if(pin !== getPIN()){ showToast('PIN salah'); return; }
+  if(!confirm('Hapus santri ini beserta seluruh riwayat absensinya?')) return;
+  DB.santri = DB.santri.filter(s=>s.id!==id);
+  delete DB.absensi[id];
+  saveLocal();
+  renderDaftarSantri();
+  showToast('Santri dihapus');
+}
+
+function escapeHtml(str){
+  return str.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+/* ============ TAB 2: ABSENSI HARIAN ============ */
+function muatSantriAbsensi(){
+  const kelompok = document.getElementById('ab-kelompok').value;
+  const kelas = document.getElementById('ab-kelas').value;
+  const tanggal = document.getElementById('ab-tanggal').value;
+  const listEl = document.getElementById('list-absensi');
+  const emptyEl = document.getElementById('empty-absensi');
+  const subEl = document.getElementById('absensi-sub');
+  const quickEl = document.getElementById('quick-actions');
+  const saveWrap = document.getElementById('save-absensi-wrap');
+
+  if(!kelompok || !kelas || !tanggal){
+    listEl.innerHTML=""; emptyEl.style.display='block'; quickEl.style.display='none'; saveWrap.style.display='none';
+    return;
+  }
+  const list = DB.santri.filter(s=>s.kelompok===kelompok && s.kelas===kelas)
+    .sort((a,b)=>a.nama.localeCompare(b.nama));
+
+  if(list.length===0){
+    listEl.innerHTML=""; emptyEl.style.display='block'; emptyEl.textContent = 'Belum ada santri terdaftar pada kelompok "'+kelompok+'" kelas "'+kelas+'". Tambahkan di tab Data Santri.';
+    quickEl.style.display='none'; saveWrap.style.display='none';
+    subEl.textContent = `${kelompok} — ${kelas}`;
+    return;
+  }
+  emptyEl.style.display='none'; quickEl.style.display='block'; saveWrap.style.display='block';
+  subEl.textContent = `${kelompok} — ${kelas} — ${formatTanggalPanjang(tanggal)}`;
+
+  const ym = tanggal.slice(0,7);
+  const day = String(parseInt(tanggal.slice(8,10),10));
+
+  pendingAbsensiState = {};
+  listEl.innerHTML = "";
+  list.forEach(s=>{
+    const existing = (DB.absensi[s.id] && DB.absensi[s.id][ym]) ? DB.absensi[s.id][ym][day] : undefined;
+    pendingAbsensiState[s.id] = existing || null;
+    const row = document.createElement('div');
+    row.className = 'santri-row';
+    row.innerHTML = `
+      <div>
+        <div class="santri-name">${escapeHtml(s.nama)}</div>
+      </div>
+      <div class="status-btns" style="max-width:280px;" id="stbtn-${s.id}">
+        <button type="button" class="status-btn" data-st="H" onclick="setStatus('${s.id}','H')">Hadir</button>
+        <button type="button" class="status-btn" data-st="I" onclick="setStatus('${s.id}','I')">Izin</button>
+        <button type="button" class="status-btn" data-st="A" onclick="setStatus('${s.id}','A')">Tanpa Ket.</button>
+      </div>`;
+    listEl.appendChild(row);
+    refreshStatusBtns(s.id);
+  });
+}
+
+function setStatus(santriId, status){
+  pendingAbsensiState[santriId] = pendingAbsensiState[santriId]===status ? null : status;
+  refreshStatusBtns(santriId);
+}
+
+function refreshStatusBtns(santriId){
+  const wrap = document.getElementById('stbtn-'+santriId);
+  if(!wrap) return;
+  const st = pendingAbsensiState[santriId];
+  wrap.querySelectorAll('.status-btn').forEach(b=>{
+    b.classList.remove('sel-h','sel-i','sel-a');
+    if(b.dataset.st===st){
+      if(st==='H') b.classList.add('sel-h');
+      if(st==='I') b.classList.add('sel-i');
+      if(st==='A') b.classList.add('sel-a');
+    }
+  });
+}
+
+function tandaiSemua(status){
+  Object.keys(pendingAbsensiState).forEach(id=>{
+    pendingAbsensiState[id] = status;
+    refreshStatusBtns(id);
+  });
+}
+
+function simpanAbsensi(){
+  const tanggal = document.getElementById('ab-tanggal').value;
+  if(!tanggal){ showToast('Pilih tanggal terlebih dahulu'); return; }
+  const ym = tanggal.slice(0,7);
+  const day = String(parseInt(tanggal.slice(8,10),10));
+  let count = 0;
+  Object.keys(pendingAbsensiState).forEach(santriId=>{
+    const status = pendingAbsensiState[santriId];
+    if(!DB.absensi[santriId]) DB.absensi[santriId] = {};
+    if(!DB.absensi[santriId][ym]) DB.absensi[santriId][ym] = {};
+    if(status){
+      DB.absensi[santriId][ym][day] = status;
+      count++;
+    } else {
+      delete DB.absensi[santriId][ym][day];
+    }
+  });
+  saveLocal();
+  showToast('Absensi tersimpan untuk '+count+' santri');
+}
+
+function formatTanggalPanjang(tanggal){
+  const d = new Date(tanggal+'T00:00:00');
+  return d.toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+}
+
+/* ============ TAB 3: REKAP BULANAN ============ */
+let lastRekapList = [];
+
+function tampilkanRekap(){
+  const kelompok = document.getElementById('rk-kelompok').value;
+  const kelas = document.getElementById('rk-kelas').value;
+  const bulan = document.getElementById('rk-bulan').value; // YYYY-MM
+  const tbody = document.getElementById('tbody-rekap');
+  const emptyEl = document.getElementById('empty-rekap');
+  const statsEl = document.getElementById('rekap-stats');
+  const judulEl = document.getElementById('rekap-judul');
+  const periodeEl = document.getElementById('rekap-periode');
+
+  if(!bulan){ showToast('Pilih bulan terlebih dahulu'); return; }
+
+  const list = DB.santri.filter(s => (!kelompok || s.kelompok===kelompok) && (!kelas || s.kelas===kelas))
+    .sort((a,b)=> a.kelompok.localeCompare(b.kelompok) || a.kelas.localeCompare(b.kelas) || a.nama.localeCompare(b.nama));
+
+  const [y,m] = bulan.split('-').map(Number);
+  const namaBulan = new Date(y, m-1, 1).toLocaleDateString('id-ID',{month:'long', year:'numeric'});
+  judulEl.textContent = 'Rekap Kehadiran — ' + namaBulan;
+  periodeEl.textContent = (kelompok||'Semua Kelompok') + ' · ' + (kelas||'Semua Kelas') + ' · ' + list.length + ' santri';
+
+  tbody.innerHTML = "";
+  lastRekapList = [];
+
+  if(list.length===0){
+    emptyEl.style.display='block'; emptyEl.textContent='Tidak ada santri pada filter ini.';
+    statsEl.style.display='none';
+    return;
+  }
+  emptyEl.style.display='none'; statsEl.style.display='grid';
+
+  let totalHadir=0, totalIzin=0, totalTK=0, sumPersen=0;
+
+  list.forEach((s,idx)=>{
+    const rec = computeRekapSantri(s.id, bulan);
+    totalHadir += rec.hadir; totalIzin += rec.izin; totalTK += rec.tk; sumPersen += rec.persen;
+    lastRekapList.push({ ...s, ...rec, bulan });
+
+    const tr = document.createElement('tr');
+    tr.style.cursor='pointer';
+    tr.onclick = ()=>bukaDetail(s.id, bulan);
+    tr.innerHTML = `<td>${idx+1}</td><td>${escapeHtml(s.nama)}</td><td>${s.kelompok}</td><td>${s.kelas}</td>
+      <td><span class="pill pill-h">${rec.hadir}</span></td>
+      <td><span class="pill pill-i">${rec.izin}</span></td>
+      <td><span class="pill pill-a">${rec.tk}</span></td>
+      <td>${rec.tercatat}</td>
+      <td><b>${rec.persen}%</b></td>`;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('st-santri').textContent = list.length;
+  document.getElementById('st-hadir').textContent = totalHadir;
+  document.getElementById('st-izin').textContent = totalIzin;
+  document.getElementById('st-persen').textContent = (list.length? (sumPersen/list.length).toFixed(1):0) + '%';
+}
+
+function computeRekapSantri(santriId, ym){
+  const data = (DB.absensi[santriId] && DB.absensi[santriId][ym]) ? DB.absensi[santriId][ym] : {};
+  let hadir=0, izin=0, tk=0;
+  Object.values(data).forEach(st=>{
+    if(st==='H') hadir++; else if(st==='I') izin++; else if(st==='A') tk++;
+  });
+  const tercatat = hadir+izin+tk;
+  const persen = tercatat>0 ? +(hadir/tercatat*100).toFixed(1) : 0;
+  return { hadir, izin, tk, tercatat, persen };
+}
+
+function bukaDetail(santriId, ym){
+  const s = DB.santri.find(x=>x.id===santriId);
+  if(!s) return;
+  const [y,m] = ym.split('-').map(Number);
+  const daysInMonth = new Date(y,m,0).getDate();
+  const data = (DB.absensi[santriId] && DB.absensi[santriId][ym]) ? DB.absensi[santriId][ym] : {};
+  const namaBulan = new Date(y,m-1,1).toLocaleDateString('id-ID',{month:'long', year:'numeric'});
+
+  document.getElementById('modal-nama').textContent = s.nama;
+  document.getElementById('modal-periode').textContent = s.kelompok+' · '+s.kelas+' · '+namaBulan;
+  const cal = document.getElementById('modal-cal');
+  cal.innerHTML = "";
+  for(let d=1; d<=daysInMonth; d++){
+    const st = data[String(d)];
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell' + (st==='H'?' h':st==='I'?' i':st==='A'?' a':'');
+    cell.innerHTML = `<div class="d">${d}</div><div>${st==='H'?'Hadir':st==='I'?'Izin':st==='A'?'TK':'-'}</div>`;
+    cal.appendChild(cell);
+  }
+  document.getElementById('modal-detail').classList.add('show');
+}
+function tutupModal(){ document.getElementById('modal-detail').classList.remove('show'); }
+
+async function exportRekapPDF(){
+  if(lastRekapList.length===0){ showToast('Tampilkan rekap terlebih dahulu'); return; }
+  showToast('Menyiapkan PDF...');
+  const el = document.getElementById('rekap-print-area');
+  const canvas = await html2canvas(el, { scale:2, backgroundColor:'#ffffff' });
+  const imgData = canvas.toDataURL('image/png');
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p','mm','a4');
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const imgWidth = pageWidth - 20;
+  const imgHeight = canvas.height * imgWidth / canvas.width;
+  let heightLeft = imgHeight;
+  let position = 10;
+  pdf.addImage(imgData,'PNG',10,position,imgWidth,imgHeight);
+  heightLeft -= (pageHeight-20);
+  while(heightLeft > 0){
+    position = heightLeft - imgHeight + 10;
+    pdf.addPage();
+    pdf.addImage(imgData,'PNG',10,position,imgWidth,imgHeight);
+    heightLeft -= (pageHeight-20);
+  }
+  pdf.save('Rekap-Absensi-TPA-'+(document.getElementById('rk-bulan').value)+'.pdf');
+  showToast('PDF berhasil diunduh');
+}
+
+/* ============ TAB 4: PENGATURAN ============ */
+function simpanFirebaseUrl(){
+  const url = document.getElementById('fb-url').value.trim().replace(/\/+$/,'');
+  if(!url){ showToast('Masukkan Database URL terlebih dahulu'); return; }
+  localStorage.setItem(FB_KEY, url);
+  showToast('URL Firebase disimpan');
+}
+
+function getFirebaseUrl(){
+  let url = localStorage.getItem(FB_KEY);
+  if(!url){
+    url = DEFAULT_FB_URL;
+    localStorage.setItem(FB_KEY, url);
+  }
+  return url;
+}
+
+function setSyncStatus(state, text){
+  const dot = document.getElementById('sync-dot');
+  dot.className = 'sync-dot' + (state==='ok'?' ok':state==='err'?' err':'');
+  document.getElementById('sync-status').textContent = text;
+}
+
+async function pushFirebase(manual){
+  const url = getFirebaseUrl();
+  if(!url){ showToast('Isi & simpan Database URL terlebih dahulu di Pengaturan'); return; }
+  try{
+    setSyncStatus('', 'Menyinkron...');
+    const res = await fetch(url + '/' + FB_NODE + '.json', {
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(DB)
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    setSyncStatus('ok', 'Tersinkron ke Firebase');
+    if(manual) showToast('Data berhasil dikirim ke Firebase');
+  }catch(e){
+    setSyncStatus('err', 'Gagal sinkron: '+e.message);
+    if(manual) showToast('Gagal sinkron ke Firebase');
+  }
+}
+
+async function pullFirebase(){
+  const url = getFirebaseUrl();
+  if(!url){ showToast('Isi & simpan Database URL terlebih dahulu'); return; }
+  if(!confirm('Data lokal saat ini akan ditimpa dengan data dari Firebase. Lanjutkan?')) return;
+  try{
+    setSyncStatus('', 'Mengambil data...');
+    const res = await fetch(url + '/' + FB_NODE + '.json');
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    if(data){
+      DB = { santri: data.santri||[], absensi: data.absensi||{} };
+      saveLocal();
+      renderDaftarSantri();
+      setSyncStatus('ok', 'Data dimuat dari Firebase');
+      showToast('Data berhasil dimuat dari Firebase');
+    } else {
+      setSyncStatus('', 'Tidak ada data di Firebase');
+      showToast('Belum ada data tersimpan di Firebase');
+    }
+  }catch(e){
+    setSyncStatus('err', 'Gagal mengambil data: '+e.message);
+    showToast('Gagal mengambil data dari Firebase');
+  }
+}
+
+function gantiPIN(){
+  const pin = document.getElementById('new-pin').value.trim();
+  if(!/^\d{4,8}$/.test(pin)){ showToast('PIN harus 4-8 digit angka'); return; }
+  const lama = prompt('Masukkan PIN lama untuk konfirmasi:');
+  if(lama !== getPIN()){ showToast('PIN lama salah'); return; }
+  localStorage.setItem(PIN_KEY, pin);
+  document.getElementById('new-pin').value = "";
+  showToast('PIN admin berhasil diganti');
+}
+
+function resetSemuaData(){
+  const pin = prompt('Tindakan ini akan menghapus SEMUA data santri & absensi. Masukkan PIN admin:');
+  if(pin===null) return;
+  if(pin !== getPIN()){ showToast('PIN salah'); return; }
+  if(!confirm('Yakin? Semua data akan hilang permanen dari perangkat ini.')) return;
+  DB = { santri: [], absensi: {} };
+  saveLocal();
+  renderDaftarSantri();
+  showToast('Semua data telah direset');
+}
+
+function kunciPengaturan(){
+  pengaturanUnlocked = false;
+  const santriBtn = document.querySelector('.tab-btn[data-tab="santri"]');
+  bukaTab(santriBtn);
+  showToast('Halaman Pengaturan dikunci');
+}
+
+async function autoPullSenyap(){
+  const url = getFirebaseUrl();
+  if(!url) return;
+  try{
+    setSyncStatus('', 'Menyinkron otomatis...');
+    const res = await fetch(url + '/' + FB_NODE + '.json');
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data = await res.json();
+    if(data && (data.santri||data.absensi)){
+      DB = { santri: data.santri||[], absensi: data.absensi||{} };
+      saveLocal();
+      renderDaftarSantri();
+      setSyncStatus('ok', 'Tersinkron otomatis dari Firebase');
+    } else {
+      setSyncStatus('', 'Terhubung, belum ada data di Firebase');
+    }
+  }catch(e){
+    setSyncStatus('err', 'Firebase belum terhubung: '+e.message);
+  }
+}
+
+/* ============ INIT ============ */
+function init(){
+  loadLocal();
+  initSelects();
+  document.getElementById('fb-url').value = getFirebaseUrl();
+  renderDaftarSantri();
+  if(DB.santri.length===0){
+    autoPullSenyap();
+  }
+}
+init();
+</script>
+</body>
+</html>
