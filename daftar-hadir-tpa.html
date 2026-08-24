@@ -221,8 +221,16 @@
     <p class="footer-credit">Made by <b>Suryana</b></p>
   </div>
 
-  <!-- TAB 2: ABSENSI HARIAN -->
+  <!-- TAB 2: ABSENSI -->
   <div class="tab-content" id="tab-absensi">
+    <div class="card no-print" style="padding:10px;">
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-primary btn-sm" style="flex:1;" id="btn-mode-harian" onclick="gantiModeAbsensi('harian')">🗓️ Input Harian</button>
+        <button class="btn btn-outline btn-sm" style="flex:1;" id="btn-mode-bulanan" onclick="gantiModeAbsensi('bulanan')">📅 Input Bulanan</button>
+      </div>
+    </div>
+
+    <div id="mode-absensi-harian">
     <div class="card">
       <h2>🗓️ Absensi Harian</h2>
       <p class="sub">Pilih kelompok, kelas, dan tanggal untuk mengisi kehadiran santri.</p>
@@ -256,6 +264,44 @@
         <button class="btn btn-primary" onclick="simpanAbsensi()">💾 Simpan Absensi Hari Ini</button>
       </div>
     </div>
+    </div>
+
+    <div id="mode-absensi-bulanan" style="display:none;">
+      <div class="card">
+        <h2>📅 Input Absensi Bulanan</h2>
+        <p class="sub">Isi kehadiran satu bulan penuh sekaligus dalam bentuk tabel. Klik setiap sel untuk mengganti status: kosong → Hadir → Izin → Tanpa Ket. → kosong.</p>
+        <div class="grid cols-3">
+          <div>
+            <label>Kelompok</label>
+            <select id="bl-kelompok" onchange="muatGridBulanan()"></select>
+          </div>
+          <div>
+            <label>Kelas</label>
+            <select id="bl-kelas" onchange="muatGridBulanan()"></select>
+          </div>
+          <div>
+            <label>Bulan</label>
+            <input type="month" id="bl-bulan" onchange="muatGridBulanan()">
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Tabel Kehadiran Bulanan</h2>
+        <p class="sub" id="bulanan-sub">Pilih kelompok, kelas &amp; bulan di atas untuk memuat tabel.</p>
+        <div class="no-print" style="margin-bottom:10px;font-size:11.5px;color:var(--ink-400);display:flex;gap:14px;flex-wrap:wrap;">
+          <span><span class="pill pill-h">H</span> Hadir</span>
+          <span><span class="pill pill-i">I</span> Izin</span>
+          <span><span class="pill pill-a">A</span> Tanpa Keterangan</span>
+          <span><span class="pill pill-none">-</span> Belum diisi</span>
+        </div>
+        <div class="table-scroll" id="grid-bulanan-wrap"></div>
+        <div id="empty-bulanan" class="empty">Belum ada data ditampilkan.</div>
+        <div style="margin-top:16px;" id="save-bulanan-wrap" class="no-print" style="display:none;">
+          <button class="btn btn-primary" onclick="simpanGridBulanan()">💾 Simpan Absensi Bulan Ini</button>
+        </div>
+      </div>
+    </div>
+
     <p class="footer-credit">Made by <b>Suryana</b></p>
   </div>
 
@@ -452,10 +498,13 @@ function initSelects(){
   fillSelect(document.getElementById('ab-kelas'), KELAS_LIST, false);
   fillSelect(document.getElementById('rk-kelompok'), KELOMPOK_LIST, true);
   fillSelect(document.getElementById('rk-kelas'), KELAS_LIST, true);
+  fillSelect(document.getElementById('bl-kelompok'), KELOMPOK_LIST, false);
+  fillSelect(document.getElementById('bl-kelas'), KELAS_LIST, false);
 
   const today = new Date().toISOString().slice(0,10);
   document.getElementById('ab-tanggal').value = today;
   document.getElementById('rk-bulan').value = today.slice(0,7);
+  document.getElementById('bl-bulan').value = today.slice(0,7);
 }
 
 /* ============ TAB 1: DATA SANTRI ============ */
@@ -626,6 +675,131 @@ function simpanAbsensi(){
 function formatTanggalPanjang(tanggal){
   const d = new Date(tanggal+'T00:00:00');
   return d.toLocaleDateString('id-ID', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+}
+
+/* ============ TOGGLE MODE HARIAN / BULANAN ============ */
+function gantiModeAbsensi(mode){
+  const btnH = document.getElementById('btn-mode-harian');
+  const btnB = document.getElementById('btn-mode-bulanan');
+  const wrapH = document.getElementById('mode-absensi-harian');
+  const wrapB = document.getElementById('mode-absensi-bulanan');
+  if(mode==='harian'){
+    btnH.classList.replace('btn-outline','btn-primary');
+    btnB.classList.replace('btn-primary','btn-outline');
+    wrapH.style.display='block'; wrapB.style.display='none';
+  } else {
+    btnB.classList.replace('btn-outline','btn-primary');
+    btnH.classList.replace('btn-primary','btn-outline');
+    wrapB.style.display='block'; wrapH.style.display='none';
+    muatGridBulanan();
+  }
+}
+
+/* ============ INPUT ABSENSI BULANAN (GRID) ============ */
+let gridBulananState = {}; // santriId -> { day: status|null }
+const SIKLUS_STATUS = [null,'H','I','A'];
+
+function muatGridBulanan(){
+  const kelompok = document.getElementById('bl-kelompok').value;
+  const kelas = document.getElementById('bl-kelas').value;
+  const bulan = document.getElementById('bl-bulan').value; // YYYY-MM
+  const wrap = document.getElementById('grid-bulanan-wrap');
+  const emptyEl = document.getElementById('empty-bulanan');
+  const subEl = document.getElementById('bulanan-sub');
+  const saveWrap = document.getElementById('save-bulanan-wrap');
+
+  if(!kelompok || !kelas || !bulan){
+    wrap.innerHTML=""; emptyEl.style.display='block'; saveWrap.style.display='none';
+    return;
+  }
+  const list = DB.santri.filter(s=>s.kelompok===kelompok && s.kelas===kelas)
+    .sort((a,b)=>a.nama.localeCompare(b.nama));
+
+  const [y,m] = bulan.split('-').map(Number);
+  const namaBulan = new Date(y,m-1,1).toLocaleDateString('id-ID',{month:'long', year:'numeric'});
+  const daysInMonth = new Date(y,m,0).getDate();
+
+  if(list.length===0){
+    wrap.innerHTML=""; emptyEl.style.display='block';
+    emptyEl.textContent = 'Belum ada santri terdaftar pada kelompok "'+kelompok+'" kelas "'+kelas+'". Tambahkan di tab Data Santri.';
+    saveWrap.style.display='none';
+    subEl.textContent = `${kelompok} — ${kelas}`;
+    return;
+  }
+  emptyEl.style.display='none'; saveWrap.style.display='block';
+  subEl.textContent = `${kelompok} — ${kelas} — ${namaBulan} (${daysInMonth} hari)`;
+
+  gridBulananState = {};
+  list.forEach(s=>{
+    const existing = (DB.absensi[s.id] && DB.absensi[s.id][bulan]) ? DB.absensi[s.id][bulan] : {};
+    gridBulananState[s.id] = {};
+    for(let d=1; d<=daysInMonth; d++){
+      gridBulananState[s.id][d] = existing[String(d)] || null;
+    }
+  });
+
+  let html = '<table><thead><tr><th style="position:sticky;left:0;background:var(--teal-50);z-index:1;">Nama Santri</th>';
+  for(let d=1; d<=daysInMonth; d++){ html += `<th style="text-align:center;min-width:34px;">${d}</th>`; }
+  html += '<th style="text-align:center;">Hadir</th><th style="text-align:center;">%</th></tr></thead><tbody id="grid-bulanan-body">';
+  list.forEach(s=>{
+    html += `<tr data-santri="${s.id}"><td style="position:sticky;left:0;background:#fff;font-weight:600;white-space:nowrap;">${escapeHtml(s.nama)}</td>`;
+    for(let d=1; d<=daysInMonth; d++){
+      html += `<td style="text-align:center;padding:4px;"><button type="button" class="grid-cell" data-santri="${s.id}" data-day="${d}" onclick="siklusSelBulanan('${s.id}',${d})" style="width:28px;height:28px;border-radius:7px;border:1.5px solid var(--line);font-size:10.5px;font-weight:700;cursor:pointer;">-</button></td>`;
+    }
+    html += `<td style="text-align:center;font-weight:700;" id="rowcount-${s.id}">0</td><td style="text-align:center;font-weight:700;" id="rowpersen-${s.id}">0%</td></tr>`;
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+
+  list.forEach(s=>{ for(let d=1; d<=daysInMonth; d++){ refreshSelBulanan(s.id, d); } updateRowSummary(s.id); });
+}
+
+function siklusSelBulanan(santriId, day){
+  const cur = gridBulananState[santriId][day];
+  const idx = SIKLUS_STATUS.indexOf(cur);
+  const next = SIKLUS_STATUS[(idx+1) % SIKLUS_STATUS.length];
+  gridBulananState[santriId][day] = next;
+  refreshSelBulanan(santriId, day);
+  updateRowSummary(santriId);
+}
+
+function refreshSelBulanan(santriId, day){
+  const btn = document.querySelector(`.grid-cell[data-santri="${santriId}"][data-day="${day}"]`);
+  if(!btn) return;
+  const st = gridBulananState[santriId][day];
+  btn.textContent = st || '-';
+  btn.style.background = st==='H' ? '#e3f6ec' : st==='I' ? '#fff3d6' : st==='A' ? '#fdeceb' : '#f4f7f6';
+  btn.style.color = st==='H' ? 'var(--ok)' : st==='I' ? 'var(--warn)' : st==='A' ? 'var(--danger)' : 'var(--ink-400)';
+  btn.style.borderColor = st ? btn.style.background : 'var(--line)';
+}
+
+function updateRowSummary(santriId){
+  const days = gridBulananState[santriId];
+  let hadir=0, tercatat=0;
+  Object.values(days).forEach(st=>{ if(st){ tercatat++; if(st==='H') hadir++; } });
+  const persen = tercatat>0 ? (hadir/tercatat*100).toFixed(1) : '0.0';
+  const elC = document.getElementById('rowcount-'+santriId);
+  const elP = document.getElementById('rowpersen-'+santriId);
+  if(elC) elC.textContent = hadir;
+  if(elP) elP.textContent = persen+'%';
+}
+
+function simpanGridBulanan(){
+  const bulan = document.getElementById('bl-bulan').value;
+  if(!bulan){ showToast('Pilih bulan terlebih dahulu'); return; }
+  let count = 0;
+  Object.keys(gridBulananState).forEach(santriId=>{
+    if(!DB.absensi[santriId]) DB.absensi[santriId] = {};
+    if(!DB.absensi[santriId][bulan]) DB.absensi[santriId][bulan] = {};
+    const days = gridBulananState[santriId];
+    Object.keys(days).forEach(day=>{
+      const st = days[day];
+      if(st){ DB.absensi[santriId][bulan][day] = st; count++; }
+      else { delete DB.absensi[santriId][bulan][day]; }
+    });
+  });
+  saveLocal();
+  showToast('Absensi bulanan tersimpan untuk '+Object.keys(gridBulananState).length+' santri');
 }
 
 /* ============ TAB 3: REKAP BULANAN ============ */
