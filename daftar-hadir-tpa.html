@@ -516,6 +516,7 @@ function tambahSantri(){
   const id = 's_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
   DB.santri.push({ id, nama, kelompok, kelas });
   saveLocal();
+  pushFirebase(false);
   document.getElementById('in-nama-santri').value = "";
   document.getElementById('in-nama-santri').focus();
   renderDaftarSantri();
@@ -669,6 +670,7 @@ function simpanAbsensi(){
     }
   });
   saveLocal();
+  pushFirebase(false);
   showToast('Absensi tersimpan untuk '+count+' santri');
 }
 
@@ -799,6 +801,7 @@ function simpanGridBulanan(){
     });
   });
   saveLocal();
+  pushFirebase(false);
   showToast('Absensi bulanan tersimpan untuk '+Object.keys(gridBulananState).length+' santri');
 }
 
@@ -948,14 +951,18 @@ async function pushFirebase(manual){
   if(!url){ showToast('Isi & simpan Database URL terlebih dahulu di Pengaturan'); return; }
   try{
     setSyncStatus('', 'Menyinkron...');
-    const res = await fetch(url + '/' + FB_NODE + '.json', {
-      method:'PUT',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(DB)
+    const santriObj = {};
+    DB.santri.forEach(s=>{ santriObj[s.id] = s; });
+    const res1 = await fetch(url + '/' + FB_NODE + '/santri.json', {
+      method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(santriObj)
     });
-    if(!res.ok) throw new Error('HTTP '+res.status);
+    if(!res1.ok) throw new Error('Santri HTTP '+res1.status);
+    const res2 = await fetch(url + '/' + FB_NODE + '/absensi.json', {
+      method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(DB.absensi)
+    });
+    if(!res2.ok) throw new Error('Absensi HTTP '+res2.status);
     setSyncStatus('ok', 'Tersinkron ke Firebase');
-    if(manual) showToast('Data berhasil dikirim ke Firebase');
+    if(manual) showToast('Data berhasil digabung ke Firebase');
   }catch(e){
     setSyncStatus('err', 'Gagal sinkron: '+e.message);
     if(manual) showToast('Gagal sinkron ke Firebase');
@@ -965,26 +972,54 @@ async function pushFirebase(manual){
 async function pullFirebase(){
   const url = getFirebaseUrl();
   if(!url){ showToast('Isi & simpan Database URL terlebih dahulu'); return; }
-  if(!confirm('Data lokal saat ini akan ditimpa dengan data dari Firebase. Lanjutkan?')) return;
   try{
-    setSyncStatus('', 'Mengambil data...');
+    setSyncStatus('', 'Mengambil & menggabungkan data...');
     const res = await fetch(url + '/' + FB_NODE + '.json');
     if(!res.ok) throw new Error('HTTP '+res.status);
     const data = await res.json();
     if(data){
-      DB = { santri: data.santri||[], absensi: data.absensi||{} };
+      gabungkanDataDariRemote(data);
       saveLocal();
       renderDaftarSantri();
-      setSyncStatus('ok', 'Data dimuat dari Firebase');
-      showToast('Data berhasil dimuat dari Firebase');
+      setSyncStatus('ok', 'Data digabung dari Firebase');
+      showToast('Data dari semua perangkat berhasil digabung');
     } else {
-      setSyncStatus('', 'Tidak ada data di Firebase');
+      setSyncStatus('', 'Belum ada data di Firebase');
       showToast('Belum ada data tersimpan di Firebase');
     }
   }catch(e){
     setSyncStatus('err', 'Gagal mengambil data: '+e.message);
     showToast('Gagal mengambil data dari Firebase');
   }
+}
+
+function gabungkanDataDariRemote(data){
+  // Gabung santri: dukung format lama (array) maupun baru (object by id)
+  let remoteSantriMap = {};
+  const rs = data.santri || {};
+  if(Array.isArray(rs)){
+    rs.forEach(s=>{ if(s && s.id) remoteSantriMap[s.id] = s; });
+  } else {
+    remoteSantriMap = rs;
+  }
+  const localMap = {};
+  DB.santri.forEach(s=>{ localMap[s.id] = s; });
+  const mergedMap = { ...localMap, ...remoteSantriMap };
+  DB.santri = Object.values(mergedMap);
+
+  // Gabung absensi secara mendalam per santri/bulan/tanggal
+  const remoteAbsensi = data.absensi || {};
+  Object.keys(remoteAbsensi).forEach(santriId=>{
+    if(!DB.absensi[santriId]) DB.absensi[santriId] = {};
+    const bulanData = remoteAbsensi[santriId] || {};
+    Object.keys(bulanData).forEach(ym=>{
+      if(!DB.absensi[santriId][ym]) DB.absensi[santriId][ym] = {};
+      const hariData = bulanData[ym] || {};
+      Object.keys(hariData).forEach(day=>{
+        DB.absensi[santriId][ym][day] = hariData[day];
+      });
+    });
+  });
 }
 
 function gantiPIN(){
@@ -1024,7 +1059,7 @@ async function autoPullSenyap(){
     if(!res.ok) throw new Error('HTTP '+res.status);
     const data = await res.json();
     if(data && (data.santri||data.absensi)){
-      DB = { santri: data.santri||[], absensi: data.absensi||{} };
+      gabungkanDataDariRemote(data);
       saveLocal();
       renderDaftarSantri();
       setSyncStatus('ok', 'Tersinkron otomatis dari Firebase');
@@ -1042,9 +1077,7 @@ function init(){
   initSelects();
   document.getElementById('fb-url').value = getFirebaseUrl();
   renderDaftarSantri();
-  if(DB.santri.length===0){
-    autoPullSenyap();
-  }
+  autoPullSenyap();
 }
 init();
 </script>
