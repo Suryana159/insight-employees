@@ -428,7 +428,7 @@ const STORAGE_KEY = "tpa_absensi_data_v1";
 const FB_KEY = "tpa_absensi_firebase_url";
 const PIN_KEY = "tpa_absensi_pin";
 const FB_NODE = "daftarHadirTPA";
-const DEFAULT_FB_URL = "https://employees-insight-default-rtdb.firebaseio.com";
+const DEFAULT_FB_URL = "https://employees-insight-default-rtdb.asia-southeast1.firebasedatabase.app";
 
 let DB = { santri: [], absensi: {} }; // absensi[santriId][YYYY-MM][day] = 'H'|'I'|'A'
 let pendingAbsensiState = {}; // santriId -> status, for the currently loaded day
